@@ -1,0 +1,94 @@
+========================================================================
+ DermAI — Quantum Coders : FULL WEB APP (Flask + SQL database)
+ Skin cancer classification (Melanoma / BCC / SCC / MCC) + stage + report
+========================================================================
+
+WHAT THIS IS
+  A complete web application. The HTML/CSS/JS is the FRONT END; a Flask
+  backend (app.py) serves it and stores everything in a SQL database.
+  You MUST run it with Python and open http://localhost:5000 — do NOT
+  double-click index.html (that cannot reach the server or database).
+
+------------------------------------------------------------------------
+STEP 1 — INSTALL (one time)
+------------------------------------------------------------------------
+  Open a terminal INSIDE the DermAI_App folder, then:
+
+    python -m venv venv
+    venv\Scripts\activate            (Windows)
+    source venv/bin/activate         (macOS / Linux)
+    pip install -r requirements.txt
+
+------------------------------------------------------------------------
+STEP 2A — RUN with built-in SQLite (zero setup, to confirm it works)
+------------------------------------------------------------------------
+    python app.py
+
+  Open  http://localhost:5000  and log in:
+      doctor@dermai.lk  /  Password@123      (doctor)
+      admin@dermai.lk   /  Password@123      (admin console: /#admin)
+
+------------------------------------------------------------------------
+STEP 2B — RUN on your MySQL database server
+------------------------------------------------------------------------
+  1) Install the MySQL driver:
+         pip install PyMySQL
+
+  2) Create the database on your server (phpMyAdmin SQL tab, or mysql CLI):
+         CREATE DATABASE dermai CHARACTER SET utf8mb4;
+     (Tables are created automatically on first run. If you prefer to
+      create them by hand, run the included schema.sql instead.)
+
+  3) Point the app at your server, then run it.
+
+     Windows CMD (no quotes, no spaces around =):
+         set DATABASE_URL=mysql+pymysql://root:YOUR_PASSWORD@localhost:3306/dermai
+         python app.py
+
+     Windows PowerShell:
+         $env:DATABASE_URL="mysql+pymysql://root:YOUR_PASSWORD@localhost:3306/dermai"
+         python app.py
+
+     macOS / Linux:
+         export DATABASE_URL="mysql+pymysql://root:YOUR_PASSWORD@localhost:3306/dermai"
+         python app.py
+
+  On first run you will see "Seeded demo users". Refresh phpMyAdmin and
+  the dermai database will contain 5 tables with data.
+
+  NOTE: the DATABASE_URL variable lasts only for that terminal window.
+        Set it again each time before "python app.py", or it falls back
+        to SQLite. If your password has @ : / # etc., URL-encode them
+        (e.g. @ becomes %40).
+
+------------------------------------------------------------------------
+STEP 3 — USE THE APP (all functional requirements)
+------------------------------------------------------------------------
+  Log in  ->  New Assessment:
+    1. Patient Info      (saved to `patients`)
+    2. Image Upload      (real quality check: resolution/size/blur; saved to `image_assets`)
+    3. Symptoms          (five switchable windows: Melanoma/BCC/SCC/MCC/General)
+    4. AI Analysis       (inference: fusion 0.60 image / 0.40 symptoms)
+    5. Results           (probabilities, stage, urgency, Grad-CAM heatmap)
+  Records  -> every past patient/assessment (from the database)
+  Download PDF -> full report with mandatory clinical disclaimer
+  Admin console (/#admin, admin login) -> users, stats, audit log
+
+  Every action is written to the `audit_log` table.
+
+------------------------------------------------------------------------
+TROUBLESHOOTING
+------------------------------------------------------------------------
+  * Symptoms / any step looks blank  -> you are viewing a cached old file.
+      Stop the app (Ctrl+C), run `python app.py` again, then in the
+      browser press Ctrl+Shift+R (hard refresh).
+  * "export not recognized"          -> you are on Windows; use `set` (CMD)
+      or `$env:` (PowerShell), not `export`.
+  * Login shows dashboard instantly  -> fixed: the app now always requires
+      you to type credentials and click Sign In.
+  * Can't connect to MySQL           -> server not running, wrong host/port,
+      or wrong password in DATABASE_URL.
+
+  Trained model (optional): drop your dermai_best.pth into models_store/
+  and `pip install torch timm`; /health then shows "mode": "trained".
+========================================================================

@@ -1,0 +1,16 @@
+Flask>=3.0
+Flask-SQLAlchemy>=3.1
+SQLAlchemy>=2.0
+Werkzeug>=3.0
+Pillow>=10.0
+reportlab>=4.0
+numpy>=1.24
+# --- optional: image hair-removal + richer heatmaps (recommended) ---
+opencv-python-headless>=4.8
+# --- optional: MySQL driver (uncomment if you use MySQL) ---
+# PyMySQL>=1.1
+# --- optional: PostgreSQL driver ---
+# psycopg2-binary>=2.9
+# --- optional: trained-model inference (only if you have dermai_best.pth) ---
+# torch>=2.1
+# timm>=0.9

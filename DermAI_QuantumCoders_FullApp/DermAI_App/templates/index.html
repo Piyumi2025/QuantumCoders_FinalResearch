@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DermAI — Quantum Coders</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body>
+
+<div id="toasts"></div>
+
+<!-- AUTH — LOGIN -->
+<div id="scr-login" class="screen active">
+  <div class="auth-layout">
+    <div class="auth-left">
+      <div class="auth-logo-big">🔬</div>
+      <div class="auth-hl">AI-Powered Skin Cancer Classification</div>
+      <div class="auth-sub">DermAI combines dermoscopic image analysis with clinical symptom data to classify Melanoma, BCC, SCC, and MCC — with ABCDE, AEIOU, and BCC/SCC clinical rules encoded.</div>
+      <div class="auth-feat"><div class="auth-feat-icon">🧠</div><span style="font-size:13.5px;font-weight:500;">EfficientNet-B4 CNN + 14-dim Symptom MLP fusion</span></div>
+      <div class="auth-feat"><div class="auth-feat-icon">🩺</div><span style="font-size:13.5px;font-weight:500;">4 cancer types · 3 stages · Urgency triage system</span></div>
+      <div class="auth-feat"><div class="auth-feat-icon">🌡️</div><span style="font-size:13.5px;font-weight:500;">Grad-CAM visual explanation for clinical trust</span></div>
+      <div class="auth-feat"><div class="auth-feat-icon">🇱🇰</div><span style="font-size:13.5px;font-weight:500;">Optimised for South Asian skin phenotypes (III–V)</span></div>
+      <div style="margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);font-size:11px;color:rgba(255,255,255,.35);">Quantum Coders · Faculty of Applied Sciences · Rajarata University of Sri Lanka</div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-form">
+        <div class="auth-form-title" id="login-title">Welcome back</div>
+        <div class="auth-form-sub" id="login-subtitle">Sign in to your DermAI account</div>
+        <div id="admin-endpoint-hint" style="display:none;" class="alert alert-info">🔒 <strong>Admin endpoint.</strong> Administrator sign-in required to access the system console.</div>
+        <div id="login-err" style="display:none;" class="alert alert-danger">⚠️ <span id="login-err-msg">Invalid credentials</span></div>
+        <div class="fgroup"><label class="flabel">Email Address</label><input id="login-email" class="finput" type="email" value="doctor@dermai.lk" placeholder="your@hospital.lk"/></div>
+        <div class="fgroup"><label class="flabel">Password</label>
+          <div class="pass-wrap"><input id="login-pass" class="finput" type="password" value="Password@123" placeholder="Min. 8 characters"/><span class="pass-eye" onclick="togglePass('login-pass',this)">👁</span></div>
+        </div>
+        <div class="flex-between" style="margin-bottom:22px;">
+          <label class="flex-start" style="gap:8px;cursor:pointer;font-size:13px;"><div class="chk-box" onclick="this.classList.toggle('on')"></div>Remember me</label>
+          <span style="font-size:13px;color:var(--p700);font-weight:700;cursor:pointer;" onclick="go('forgot')">Forgot Password?</span>
+        </div>
+        <button class="btn btn-primary btn-full btn-lg" onclick="doLogin()">Sign In to DermAI →</button>
+        <div class="divider-text"><span>quick demo login</span></div>
+        <button class="btn btn-secondary btn-full" onclick="quickLogin('doctor')">🩺 Demo Doctor Login</button>
+        <div class="divider-text"><span>no account?</span></div>
+        <button class="btn btn-outline btn-full" style="margin-top:14px;" onclick="go('signup')">Create Account</button>
+        <div class="alert alert-info" style="margin-top:20px;font-size:12px;">⚕️ For licensed medical professionals only. All results require specialist confirmation and biopsy.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH — SIGN UP -->
+<div id="scr-signup" class="screen">
+  <div class="auth-layout">
+    <div class="auth-left">
+      <div class="auth-logo-big">🔬</div>
+      <div class="auth-hl">Join DermAI</div>
+      <div class="auth-sub">Create your account to access AI-powered skin cancer risk assessment. Requires a valid SLMC medical registration number.</div>
+      <div class="auth-feat"><div class="auth-feat-icon">🛡️</div><span style="font-size:13.5px;">GDPR & PDPA compliant data handling</span></div>
+      <div class="auth-feat"><div class="auth-feat-icon">🔐</div><span style="font-size:13.5px;">Role-based access control (Doctor / Admin)</span></div>
+      <div class="auth-feat"><div class="auth-feat-icon">📋</div><span style="font-size:13.5px;">Full audit trail for all clinical actions</span></div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-form">
+        <div class="auth-form-title">Create Account</div>
+        <div class="auth-form-sub">Register as a medical professional</div>
+        <div class="input-row">
+          <div class="fgroup"><label class="flabel">First Name</label><input class="finput" placeholder="First" value=""/></div>
+          <div class="fgroup"><label class="flabel">Last Name</label><input class="finput" placeholder="Last" value=""/></div>
+        </div>
+        <div class="fgroup"><label class="flabel">SLMC Reg. No.</label><input class="finput" placeholder="SLMC-XXXXX" value=""/><div class="fhint">Sri Lanka Medical Council registration number</div></div>
+        <div class="fgroup"><label class="flabel">Email Address</label><input class="finput" type="email" value=""/></div>
+        <div class="fgroup"><label class="flabel">Specialization</label><select class="finput"><option>Dermatologist</option><option>General Practitioner</option><option>Oncologist</option><option>Physician</option></select></div>
+        <div class="fgroup"><label class="flabel">Password</label>
+          <div class="pass-wrap"><input id="su-pass" class="finput" type="password" value="" oninput="checkStrength(this)"/><span class="pass-eye" onclick="togglePass('su-pass',this)">👁</span></div>
+          <div class="strength-bar"><div id="su-str" class="strength-fill strength-strong"></div></div>
+          <div id="su-str-lbl" class="fhint" style="color:var(--green);font-weight:700;">💪 Strong password</div>
+        </div>
+        <div class="fgroup"><label class="flabel">Confirm Password</label><input class="finput" type="password" value=""/><div class="fhint" style="color:var(--green);font-weight:700;">✓ Passwords match</div></div>
+        <label class="flex-start" style="margin-bottom:20px;font-size:13px;gap:8px;cursor:pointer;"><div class="chk-box" onclick="this.classList.toggle('on')"></div>I agree to <span style="color:var(--p700);font-weight:700;">Terms of Service</span> &amp; <span style="color:var(--p700);font-weight:700;">Privacy Policy</span></label>
+        <button class="btn btn-primary btn-full btn-lg" onclick="doSignup()">Create Account →</button>
+        <div class="divider-text"><span>have an account?</span></div>
+        <button class="btn btn-outline btn-full" style="margin-top:12px;" onclick="go('login')">← Back to Sign In</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH — FORGOT PASSWORD -->
+<div id="scr-forgot" class="screen" style="background:var(--bg);align-items:center;justify-content:center;">
+  <div style="max-width:440px;width:90%;padding:20px;">
+    <div class="card" style="padding:44px 38px;">
+      <div style="text-align:center;margin-bottom:28px;">
+        <div style="width:74px;height:74px;background:var(--p50);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 16px;">🔑</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--p800);margin-bottom:8px;">Reset Password</div>
+        <div style="font-size:13.5px;color:var(--muted);line-height:1.6;">Enter your registered email to receive a reset link.</div>
+      </div>
+      <div id="forgot-ok" class="alert alert-success" style="display:none;">📬 Reset link sent! Check inbox — expires in 1 hour.</div>
+      <div class="fgroup"><label class="flabel">Email Address</label><input id="forgot-email" class="finput" type="email" placeholder="your@email.com"/></div>
+      <button class="btn btn-primary btn-full btn-lg" style="margin-bottom:12px;" onclick="doForgot()">Send Reset Link 📨</button>
+      <button class="btn btn-outline btn-full" onclick="go('login')">← Back to Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH — EMAIL VERIFY -->
+<div id="scr-verify" class="screen" style="background:var(--bg);align-items:center;justify-content:center;">
+  <div style="max-width:480px;width:90%;padding:20px;">
+    <div class="card" style="text-align:center;padding:52px 40px;">
+      <div style="width:90px;height:90px;background:var(--green-l);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 22px;">✉️</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--p800);margin-bottom:12px;">Check Your Inbox</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:8px;">We've sent a verification link to</div>
+      <div style="font-size:15px;font-weight:800;color:var(--p800);margin-bottom:22px;">asha.perera@hospital.lk</div>
+      <div class="alert alert-success" style="margin-bottom:22px;">✅ Verification email sent successfully</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:24px;">Click the link in the email to activate. Link expires in <strong>24 hours</strong>. Check your spam folder.</div>
+      <button class="btn btn-primary btn-full" style="margin-bottom:10px;" onclick="go('dashboard')">Continue to Dashboard ↗</button>
+      <button class="btn btn-outline btn-full" style="margin-bottom:12px;">📧 Resend Email</button>
+      <button class="btn btn-ghost" onclick="go('login')">← Back to Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- DOCTOR DASHBOARD -->
+<div id="scr-dashboard" class="screen">
+  <nav class="topnav">
+    <div class="nav-brand" onclick="go('dashboard')"><div class="nav-logo">🔬</div><div><div class="nav-brand-text">DermAI</div><div class="nav-brand-sub">Clinical Decision Support</div></div></div>
+    <div class="nav-links">
+      <button class="nav-link active" onclick="go('dashboard')">🏠 Dashboard</button>
+      <button class="nav-link" onclick="go('assessment')">🔬 New Assessment</button>
+      <button class="nav-link" onclick="go('records')">📋 Records</button>
+      <button class="nav-link" onclick="go('profile')">👤 Profile</button>
+    </div>
+    <div class="nav-right">
+      <div class="nav-bell" onclick="showToast('3 new notifications','info')">🔔<div class="notif-dot"></div></div>
+      <div style="text-align:right;"><div class="nav-user-name" id="d-uname">Dr. A. Perera</div><div class="nav-user-role">Dermatologist · SLMC-29441</div></div>
+      <div class="nav-avatar" id="d-av">AP</div>
+      <button class="btn btn-ghost" style="color:rgba(255,255,255,.6);font-size:13px;" onclick="doLogout()">Sign Out</button>
+    </div>
+  </nav>
+  <div class="page-body">
+    <div class="flex-between" style="margin-bottom:24px;">
+      <div class="page-header" style="margin-bottom:0;"><div class="page-title" id="dash-greet">Good morning, Doctor 👋</div><div class="page-sub" id="dash-date">Clinical Summary</div></div>
+      <button class="btn btn-primary btn-lg" onclick="go('assessment')">+ New Assessment</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon" style="background:#E8EAF6;">👥</div><div><div class="stat-value">47</div><div class="stat-label">Total Patients</div><div class="stat-delta delta-up">↑ 5 this month</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:var(--amber-l);">🔬</div><div><div class="stat-value" style="color:var(--amber);">12</div><div class="stat-label">Today's Assessments</div><div class="stat-delta delta-up">↑ 3 from yesterday</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:var(--red-l);">🚨</div><div><div class="stat-value" style="color:var(--red);">3</div><div class="stat-label">Emergency Referrals</div><div class="stat-delta delta-dn">↑ 1 new today</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:var(--green-l);">📋</div><div><div class="stat-value" style="color:var(--green);">38</div><div class="stat-label">Reports Generated</div><div class="stat-delta delta-up">↑ 12 this week</div></div></div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">Recent Diagnoses</div><div class="card-subtitle">Last 7 days</div></div><button class="btn btn-sm btn-secondary" onclick="go('records')">View All →</button></div>
+        <div class="tbl-wrap"><table><thead><tr><th>Patient</th><th>Type</th><th>Stage</th><th>Urgency</th><th></th></tr></thead>
+        <tbody>
+          <tr style="cursor:pointer;" onclick="go('results')"><td><div class="td-name">Kasun Perera</div><div class="td-sub">54, Male · 01 Mar</div></td><td>Melanoma</td><td><span class="badge badge-warning">Intermediate</span></td><td><span class="badge badge-warning">URGENT</span></td><td><button class="btn btn-xs btn-secondary" onclick="event.stopPropagation();go('results')">View</button></td></tr>
+          <tr><td><div class="td-name">Nimal Bandara</div><div class="td-sub">67, Male · 28 Feb</div></td><td>MCC</td><td><span class="badge badge-danger">Advanced</span></td><td><span class="badge badge-danger">EMERGENCY</span></td><td><button class="btn btn-xs btn-secondary">View</button></td></tr>
+          <tr><td><div class="td-name">Chamara Silva</div><div class="td-sub">42, Female · 25 Feb</div></td><td>BCC</td><td><span class="badge badge-success">Early</span></td><td><span class="badge badge-neutral">ROUTINE</span></td><td><button class="btn btn-xs btn-secondary">View</button></td></tr>
+          <tr><td><div class="td-name">Priyantha W.</div><div class="td-sub">58, Male · 24 Feb</div></td><td>SCC</td><td><span class="badge badge-warning">Intermediate</span></td><td><span class="badge badge-warning">URGENT</span></td><td><button class="btn btn-xs btn-secondary">View</button></td></tr>
+        </tbody></table></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Cancer Type Distribution</div><span class="badge badge-neutral">This Month</span></div>
+        <div class="prob-row"><div class="prob-header"><span class="prob-name" style="color:var(--red);">● Melanoma</span><span class="prob-pct" style="color:var(--red);">45%</span></div><div class="prob-track"><div class="prob-fill fill-mel" style="width:45%"></div></div></div>
+        <div class="prob-row"><div class="prob-header"><span class="prob-name" style="color:var(--p700);">● Basal Cell Carcinoma</span><span class="prob-pct" style="color:var(--p700);">35%</span></div><div class="prob-track"><div class="prob-fill fill-bcc" style="width:35%"></div></div></div>
+        <div class="prob-row"><div class="prob-header"><span class="prob-name" style="color:var(--amber);">● Squamous Cell Carcinoma</span><span class="prob-pct" style="color:var(--amber);">14%</span></div><div class="prob-track"><div class="prob-fill fill-scc" style="width:14%"></div></div></div>
+        <div class="prob-row"><div class="prob-header"><span class="prob-name" style="color:var(--purple);">● Merkel Cell Carcinoma</span><span class="prob-pct" style="color:var(--purple);">6%</span></div><div class="prob-track"><div class="prob-fill fill-mcc" style="width:6%"></div></div></div>
+        <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" onclick="go('assessment')">+ New Assessment</button>
+          <button class="btn btn-outline btn-sm" onclick="go('records')">Patient Records</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="qc-footer">Quantum Coders · DermAI v1.0.0 · Rajarata University of Sri Lanka · For clinical decision support only</div>
+</div>
+
+<!-- NEW ASSESSMENT — 5 STEPS (preprocessing removed) -->
+<div id="scr-assessment" class="screen">
+  <nav class="topnav">
+    <div class="nav-brand" onclick="go('dashboard')"><div class="nav-logo">🔬</div><div><div class="nav-brand-text">DermAI</div><div class="nav-brand-sub">New Assessment</div></div></div>
+    <div class="nav-links">
+      <button class="nav-link" onclick="go('dashboard')">🏠 Dashboard</button>
+      <button class="nav-link active">🔬 New Assessment</button>
+      <button class="nav-link" onclick="go('records')">📋 Records</button>
+    </div>
+    <div class="nav-right">
+      <div style="text-align:right;"><div class="nav-user-name" id="a-uname">Dr. A. Perera</div><div class="nav-user-role">Dermatologist</div></div>
+      <div class="nav-avatar" id="a-av">AP</div>
+      <button class="btn btn-ghost" style="color:rgba(255,255,255,.6);font-size:13px;" onclick="doLogout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- WIZARD BAR (5 steps) -->
+  <div class="wizard-bar">
+    <div class="wizard-steps" id="wiz-bar">
+      <div class="wstep" onclick="tryJumpTo(1)"><div class="wstep-circle active" id="ws1">1</div><div class="wstep-label active" id="wl1">Patient Info</div></div>
+      <div class="wstep-line idle" id="wc1"></div>
+      <div class="wstep" onclick="tryJumpTo(2)"><div class="wstep-circle idle" id="ws2">2</div><div class="wstep-label idle" id="wl2">Image Upload</div></div>
+      <div class="wstep-line idle" id="wc2"></div>
+      <div class="wstep" onclick="tryJumpTo(3)"><div class="wstep-circle idle" id="ws3">3</div><div class="wstep-label idle" id="wl3">Symptoms</div></div>
+      <div class="wstep-line idle" id="wc3"></div>
+      <div class="wstep" onclick="tryJumpTo(4)"><div class="wstep-circle idle" id="ws4">4</div><div class="wstep-label idle" id="wl4">AI Analysis</div></div>
+      <div class="wstep-line idle" id="wc4"></div>
+      <div class="wstep" onclick="tryJumpTo(5)"><div class="wstep-circle idle" id="ws5">5</div><div class="wstep-label idle" id="wl5">Results</div></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+    <!-- STEP 1: PATIENT INFO -->
+    <div id="ast-1">
+      <div class="flex-between" style="margin-bottom:20px;">
+        <div class="page-header" style="margin-bottom:0;"><div class="page-title">Step 1 — Patient Information</div><div class="page-sub">Enter complete patient demographics and clinical history</div></div>
+        <span class="badge badge-primary" style="font-size:12px;">1 of 5</span>
+      </div>
+      <div class="g2">
+        <div style="display:flex;flex-direction:column;gap:18px;">
+          <div class="card">
+            <div class="section-title">👤 Patient Demographics</div>
+            <div class="input-row">
+              <div class="fgroup"><label class="flabel">Patient ID</label><input id="pt-id" class="finput" value="" placeholder="Auto-generated" readonly style="background:var(--surface);color:var(--muted);"/></div>
+              <div class="fgroup"><label class="flabel">Date</label><input class="finput" value="" type="date"/></div>
+            </div>
+            <div class="input-row">
+              <div class="fgroup"><label class="flabel">First Name</label><input id="pt-fn" class="finput" value="" placeholder="First name"/></div>
+              <div class="fgroup"><label class="flabel">Last Name</label><input id="pt-ln" class="finput" value="" placeholder="Last name"/></div>
+            </div>
+            <div class="input-row3">
+              <div class="fgroup"><label class="flabel">Age</label><input id="pt-age" class="finput" type="number" value="" min="0" max="120"/></div>
+              <div class="fgroup"><label class="flabel">Gender</label><select id="pt-gender" class="finput"><option>Male</option><option>Female</option><option>Other</option></select></div>
+              <div class="fgroup"><label class="flabel">Contact No.</label><input class="finput" value=""/></div>
+            </div>
+            <div class="fgroup"><label class="flabel">NIC / Passport No.</label><input class="finput" value="" placeholder="National ID"/></div>
+            <div class="fgroup"><label class="flabel">Address</label><textarea class="finput" style="min-height:60px;" placeholder="Patient address"></textarea></div>
+          </div>
+          <div class="card">
+            <div class="section-title">🌍 Fitzpatrick Skin Type</div>
+            <div class="section-sub">Select the closest match — affects AI bias correction for South Asian phenotypes</div>
+            <div class="skin-picker">
+              <div class="skin-swatch" style="background:#FDDBB4;" onclick="selSkin(this,'I')" title="Type I"><div class="skin-tip">Type I</div></div>
+              <div class="skin-swatch" style="background:#F2C27B;" onclick="selSkin(this,'II')" title="Type II"><div class="skin-tip">Type II</div></div>
+              <div class="skin-swatch" style="background:#C68642;" onclick="selSkin(this,'III')" title="Type III"><div class="skin-tip">Type III</div></div>
+              <div class="skin-swatch" style="background:#8D5524;" onclick="selSkin(this,'IV')" title="Type IV — South Asian"><div class="skin-tip">Type IV</div></div>
+              <div class="skin-swatch" style="background:#5C2E10;" onclick="selSkin(this,'V')" title="Type V"><div class="skin-tip">Type V</div></div>
+              <div class="skin-swatch" style="background:#2C1306;" onclick="selSkin(this,'VI')" title="Type VI"><div class="skin-tip">Type VI</div></div>
+            </div>
+            <div class="alert alert-info" style="margin-top:28px;font-size:12px;">ℹ️ South Asian patients typically fall under Fitzpatrick III–V. The AI model applies skin-type-specific preprocessing.</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:18px;">
+          <div class="card">
+            <div class="section-title">📍 Lesion Location</div>
+            <div class="section-sub">Select the primary lesion site on the body map</div>
+            <div class="body-grid">
+              <div class="body-cell" onclick="selBody(this)">Head / Scalp</div>
+              <div class="body-cell" onclick="selBody(this)">Face</div>
+              <div class="body-cell" onclick="selBody(this)">Neck</div>
+              <div class="body-cell" onclick="selBody(this)">Back</div>
+              <div class="body-cell" onclick="selBody(this)">Chest</div>
+              <div class="body-cell" onclick="selBody(this)">Abdomen</div>
+              <div class="body-cell" onclick="selBody(this)">Upper Arm</div>
+              <div class="body-cell" onclick="selBody(this)">Lower Arm</div>
+              <div class="body-cell" onclick="selBody(this)">Hand / Nail</div>
+              <div class="body-cell" onclick="selBody(this)">Thigh</div>
+              <div class="body-cell" onclick="selBody(this)">Leg</div>
+              <div class="body-cell" onclick="selBody(this)">Foot / Sole</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="section-title">📝 Clinical History</div>
+            <div class="input-row">
+              <div class="fgroup"><label class="flabel">Duration (Weeks)</label><input id="pt-dur" class="finput" type="number" value=""/></div>
+              <div class="fgroup"><label class="flabel">Growth Speed</label><select id="pt-growth" class="finput"><option>Slow</option><option>Moderate</option><option>Rapid</option></select></div>
+            </div>
+            <div class="input-row">
+              <div class="fgroup"><label class="flabel">No. of Moles (Nevi)</label><input class="finput" type="number" value="" placeholder="~count"/></div>
+              <div class="fgroup"><label class="flabel">Age at Exam</label><input class="finput" type="number" value=""/></div>
+            </div>
+            <div class="fgroup"><label class="flabel">Sun Exposure History</label><select class="finput"><option>Minimal</option><option>Moderate</option><option>Significant / Chronic</option></select></div>
+            <div class="fgroup"><label class="flabel">Immunosuppression</label><select class="finput"><option>None</option><option>On immunosuppressants</option><option>HIV positive</option><option>Post-organ transplant</option></select></div>
+            <div class="fgroup"><label class="flabel">Family History of Skin Cancer</label><select class="finput"><option>None Known</option><option>Yes — Melanoma</option><option>Yes — BCC</option><option>Yes — Other</option></select></div>
+            <div class="fgroup"><label class="flabel">Previous Skin Cancer History</label><select class="finput"><option>None</option><option>Yes — Melanoma</option><option>Yes — BCC</option><option>Yes — SCC</option></select></div>
+            <div class="fgroup"><label class="flabel">Clinical Notes</label><textarea id="pt-notes" class="finput"></textarea></div>
+          </div>
+          <div class="flex-end">
+            <button class="btn btn-outline" onclick="go('dashboard')">← Cancel</button>
+            <button class="btn btn-primary btn-lg" onclick="goStep(2)">Next: Image Upload →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: IMAGE UPLOAD -->
+    <div id="ast-2" style="display:none;">
+      <div class="flex-between" style="margin-bottom:20px;">
+        <div class="page-header" style="margin-bottom:0;"><div class="page-title">Step 2 — Dermoscopic Image Upload</div><div class="page-sub">Upload a clear dermoscopic image of the lesion for AI analysis</div></div>
+        <span class="badge badge-primary" style="font-size:12px;">2 of 5</span>
+      </div>
+      <div class="g2">
+        <div style="display:flex;flex-direction:column;gap:18px;">
+          <div class="card">
+            <div class="section-title">📷 Upload Lesion Image</div>
+            <div class="dropzone" id="dz" onclick="simulateUpload()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')">
+              <div class="dropzone-icon">🖼️</div>
+              <div class="dropzone-title">Drag & drop image here</div>
+              <div class="dropzone-hint">JPG · PNG · JPEG · TIFF · Max 10 MB · Minimum 299×299 px</div>
+              <button class="btn btn-secondary" style="margin-top:16px;" onclick="event.stopPropagation();simulateUpload()">Browse Files</button>
+            </div>
+            <div id="img-prev" style="display:none;">
+              <div class="img-preview">
+                <div class="img-thumb">🩺</div>
+                <div style="flex:1;">
+                  <div class="img-name">lesion_kasun_2026_03_01.jpg</div>
+                  <div class="img-meta">—</div>
+                  <div class="img-badges" style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;"></div>
+                </div>
+                <button class="btn btn-xs btn-ghost" onclick="removeImg()">🗑️ Remove</button>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="section-title">📋 Image Guidelines</div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+              <div style="display:flex;gap:10px;"><span>✅</span><span>Use a dermoscope or close-up mode (≤ 10cm)</span></div>
+              <div style="display:flex;gap:10px;"><span>✅</span><span>Ensure sharp focus — no motion blur</span></div>
+              <div style="display:flex;gap:10px;"><span>✅</span><span>Good, diffuse lighting — avoid direct flash glare</span></div>
+              <div style="display:flex;gap:10px;"><span>✅</span><span>Lesion should fill ≥ 40% of frame</span></div>
+              <div style="display:flex;gap:10px;"><span>❌</span><span>Avoid images with rulers, ink markers, or labels</span></div>
+              <div style="display:flex;gap:10px;"><span>❌</span><span>Avoid heavily hair-covered areas if possible</span></div>
+              <div style="display:flex;gap:10px;"><span>❌</span><span>Do not crop below 299×299 px</span></div>
+            </div>
+            <div class="alert alert-warn" style="margin-top:14px;font-size:12px;">⚠️ Hair artifacts and specular reflections may reduce AI accuracy. The system applies DullRazor hair removal automatically before inference.</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:18px;">
+          <div class="card">
+            <div class="section-title">🔍 Auto Quality Assessment</div>
+            <div id="qa-idle-msg" style="text-align:center;padding:30px 0;color:var(--muted);">
+              <div style="font-size:44px;margin-bottom:14px;">📤</div>
+              <div style="font-size:14px;font-weight:600;">Upload an image to run quality check</div>
+            </div>
+            <div id="qa-list" style="display:none;">
+          </div>
+          <div class="card">
+            <div class="section-title">📊 Accepted File Specifications</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12.5px;">
+              <div style="padding:10px;background:var(--p50);border-radius:var(--r-xs);"><div style="font-weight:800;color:var(--p800);margin-bottom:4px;">Formats</div>JPG, PNG, JPEG, TIFF</div>
+              <div style="padding:10px;background:var(--p50);border-radius:var(--r-xs);"><div style="font-weight:800;color:var(--p800);margin-bottom:4px;">Max Size</div>10 MB</div>
+              <div style="padding:10px;background:var(--p50);border-radius:var(--r-xs);"><div style="font-weight:800;color:var(--p800);margin-bottom:4px;">Min Resolution</div>299 × 299 px</div>
+              <div style="padding:10px;background:var(--p50);border-radius:var(--r-xs);"><div style="font-weight:800;color:var(--p800);margin-bottom:4px;">Colour Space</div>RGB (sRGB)</div>
+              <div style="padding:10px;background:var(--p50);border-radius:var(--r-xs);"><div style="font-weight:800;color:var(--p800);margin-bottom:4px;">Bit Depth</div>8-bit or 16-bit</div>
+              <div style="padding:10px;background:var(--p50);border-radius:var(--r-xs);"><div style="font-weight:800;color:var(--p800);margin-bottom:4px;">Orientation</div>Any (EXIF applied)</div>
+            </div>
+          </div>
+          <div class="flex-end">
+            <button class="btn btn-outline" onclick="goStep(1)">← Back</button>
+            <button class="btn btn-primary btn-lg" id="next-s2" onclick="goStep(3)">Next: Symptoms →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    </div>
+
+    <!-- STEP 3: SYMPTOMS — separate windows (tabs) on the same page -->
+    <div id="ast-3" style="display:none;">
+      <div class="flex-between" style="margin-bottom:20px;">
+        <div class="page-header" style="margin-bottom:0;"><div class="page-title">Step 3 — Clinical Symptom Assessment</div><div class="page-sub">Switch between windows to complete each criteria set — feeds the 14-dimension symptom vector</div></div>
+        <span class="badge badge-primary" style="font-size:12px;">3 of 5</span>
+      </div>
+
+      <div class="alert alert-info" style="margin-bottom:18px;">ℹ️ Check ALL criteria that are <strong>present or applicable</strong> in each window. Unchecked items are encoded as <code style="background:rgba(255,255,255,.6);padding:1px 5px;border-radius:3px;">0</code>, checked items as <code style="background:rgba(255,255,255,.6);padding:1px 5px;border-radius:3px;">1</code>.</div>
+
+      <!-- window switcher -->
+      <div class="sym-tabs">
+        <button class="btn btn-primary sym-tabbtn" onclick="selSymTab(this,'sym-mel')">🔴 Melanoma (ABCDE)</button>
+        <button class="btn btn-outline sym-tabbtn" onclick="selSymTab(this,'sym-bcc')">🔵 BCC</button>
+        <button class="btn btn-outline sym-tabbtn" onclick="selSymTab(this,'sym-scc')">🟠 SCC</button>
+        <button class="btn btn-outline sym-tabbtn" onclick="selSymTab(this,'sym-mcc')">🟣 MCC (AEIOU)</button>
+        <button class="btn btn-outline sym-tabbtn" onclick="selSymTab(this,'sym-gen')">🩺 General</button>
+      </div>
+
+      <!-- WINDOW: Melanoma -->
+      <div id="sym-mel" class="sym-window card" style="margin-bottom:18px;">
+        <div class="rule-card rule-mel">
+          <div class="rule-title" style="color:var(--red);">🔴 ABCDE Rule — Melanoma</div>
+          <div class="section-sub" style="margin-bottom:10px;">Classic dermoscopic criteria for melanoma identification</div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>A — Asymmetry</strong><br/><span style="font-size:12px;color:var(--muted);">One half of lesion does not match the other half in shape or colour</span></div><span class="chk-tag chk-tag-mel">MEL</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>B — Border Irregularity</strong><br/><span style="font-size:12px;color:var(--muted);">Notched, scalloped, ragged, or blurred edges</span></div><span class="chk-tag chk-tag-mel">MEL</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>C — Colour Variation</strong><br/><span style="font-size:12px;color:var(--muted);">Multiple shades: black, brown, blue, red, white mixed</span></div><span class="chk-tag chk-tag-mel">MEL</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>D — Diameter &gt; 6 mm</strong><br/><span style="font-size:12px;color:var(--muted);">Larger than a pencil eraser; note evolution is more important</span></div><span class="chk-tag chk-tag-mel">MEL</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>E — Evolving</strong><br/><span style="font-size:12px;color:var(--muted);">Changing in size, shape, colour, or new symptom</span></div><span class="chk-tag chk-tag-mel">MEL</span></div>
+        </div>
+        <div class="rule-card rule-mel" style="margin-bottom:0;">
+          <div class="rule-title" style="color:var(--red);">🩸 Additional Melanoma Indicators</div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label">Dark streak under nail (subungual melanonychia)<br/><span style="font-size:12px;color:var(--muted);">Hutchinson's sign — periungual pigmentation</span></div><span class="chk-tag chk-tag-mel">MEL</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label">New mole in patient aged &gt; 30 years<br/><span style="font-size:12px;color:var(--muted);">New lesions in adults are more suspicious</span></div><span class="chk-tag chk-tag-mel">MEL</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label">Blue-white veil under dermoscopy<br/><span style="font-size:12px;color:var(--muted);">Irregular blue-white structure overlying melanoma</span></div><span class="chk-tag chk-tag-mel">MEL</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label">Irregular pigment network<br/><span style="font-size:12px;color:var(--muted);">Atypical network with irregular meshwork</span></div><span class="chk-tag chk-tag-mel">MEL</span></div>
+        </div>
+      </div>
+
+      <!-- WINDOW: BCC -->
+      <div id="sym-bcc" class="sym-window card" style="display:none;margin-bottom:18px;">
+        <div class="rule-card rule-bcc" style="margin-bottom:0;">
+          <div class="rule-title" style="color:var(--p700);">🔵 BCC — Basal Cell Carcinoma Indicators</div>
+          <div class="section-sub" style="margin-bottom:10px;">Most common; slow growing. Classic nodular &amp; superficial features.</div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>Pearly / shiny papule</strong><br/><span style="font-size:12px;color:var(--muted);">Translucent, waxy, or mother-of-pearl surface</span></div><span class="chk-tag chk-tag-bcc">BCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>Rolled / raised border</strong><br/><span style="font-size:12px;color:var(--muted);">Elevated, rolled-in edges around lesion centre</span></div><span class="chk-tag chk-tag-bcc">BCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>Telangiectasia</strong><br/><span style="font-size:12px;color:var(--muted);">Arborising (tree-like) blood vessels visible on surface</span></div><span class="chk-tag chk-tag-bcc">BCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>Central depression / "rodent ulcer"</strong><br/><span style="font-size:12px;color:var(--muted);">Central crater or ulcerated core in nodular BCC</span></div><span class="chk-tag chk-tag-bcc">BCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>Red scaly patch (Superficial BCC)</strong><br/><span style="font-size:12px;color:var(--muted);">Slightly raised, erythematous plaque on trunk</span></div><span class="chk-tag chk-tag-bcc">BCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>Non-healing wound (&gt; 3 weeks)</strong><br/><span style="font-size:12px;color:var(--muted);">Chronic wound that bleeds easily and does not heal</span></div><span class="chk-tag chk-tag-bcc">BCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>Well-defined rolled edge with smooth surface</strong><br/><span style="font-size:12px;color:var(--muted);">Clear boundary unlike SCC's indurated edge</span></div><span class="chk-tag chk-tag-bcc">BCC</span></div>
+        </div>
+      </div>
+
+      <!-- WINDOW: SCC -->
+      <div id="sym-scc" class="sym-window card" style="display:none;margin-bottom:18px;">
+        <div class="rule-card rule-scc" style="margin-bottom:0;">
+          <div class="rule-title" style="color:var(--amber);">🟠 SCC — Squamous Cell Carcinoma Indicators</div>
+          <div class="section-sub" style="margin-bottom:10px;">More aggressive than BCC. Often on sun-exposed areas (chronic UV damage).</div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>Firm red nodule</strong><br/><span style="font-size:12px;color:var(--muted);">Indurated, erythematous raised lesion</span></div><span class="chk-tag chk-tag-scc">SCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>Scaly / crusted plaque surface</strong><br/><span style="font-size:12px;color:var(--muted);">Rough, adherent scale on surface</span></div><span class="chk-tag chk-tag-scc">SCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>Hyperkeratotic surface (thick keratin layer)</strong><br/><span style="font-size:12px;color:var(--muted);">Cutaneous horn or warty, heaped-up keratosis</span></div><span class="chk-tag chk-tag-scc">SCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>Ulcer with raised / indurated edge</strong><br/><span style="font-size:12px;color:var(--muted);">Central ulceration with firm, heaped-up margins</span></div><span class="chk-tag chk-tag-scc">SCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>Rapid enlargement</strong><br/><span style="font-size:12px;color:var(--muted);">Notable size increase over weeks to months</span></div><span class="chk-tag chk-tag-scc">SCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>Located on sun-exposed area</strong><br/><span style="font-size:12px;color:var(--muted);">Face, lips, ears, scalp, dorsum of hands</span></div><span class="chk-tag chk-tag-scc">SCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>Arising from actinic keratosis</strong><br/><span style="font-size:12px;color:var(--muted);">Pre-malignant solar keratosis that has transformed</span></div><span class="chk-tag chk-tag-scc">SCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>Marjolin ulcer (chronic wound / scar)</strong><br/><span style="font-size:12px;color:var(--muted);">SCC arising in chronic ulcer, burn scar, or sinus tract</span></div><span class="chk-tag chk-tag-scc">SCC</span></div>
+        </div>
+      </div>
+
+      <!-- WINDOW: MCC -->
+      <div id="sym-mcc" class="sym-window card" style="display:none;margin-bottom:18px;">
+        <div class="rule-card rule-mcc" style="margin-bottom:0;">
+          <div class="rule-title" style="color:var(--purple);">🟣 AEIOU Rule — Merkel Cell Carcinoma</div>
+          <div class="section-sub" style="margin-bottom:10px;">Rare but very aggressive neuroendocrine carcinoma. AEIOU criteria critical.</div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>A — Asymptomatic</strong><br/><span style="font-size:12px;color:var(--muted);">No pain or tenderness at lesion site</span></div><span class="chk-tag chk-tag-mcc">MCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>E — Expanding Rapidly</strong><br/><span style="font-size:12px;color:var(--muted);">Doubling size in weeks to months</span></div><span class="chk-tag chk-tag-mcc">MCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>I — Immunosuppressed Patient</strong><br/><span style="font-size:12px;color:var(--muted);">HIV, transplant, chronic immunosuppression</span></div><span class="chk-tag chk-tag-mcc">MCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>O — Older than 50 years</strong><br/><span style="font-size:12px;color:var(--muted);">Incidence rises sharply after 50 years</span></div><span class="chk-tag chk-tag-mcc">MCC</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label"><strong>U — UV-Exposed Skin Area</strong><br/><span style="font-size:12px;color:var(--muted);">Head, neck, periorbital region — chronic UV damage</span></div><span class="chk-tag chk-tag-mcc">MCC</span></div>
+          <div style="margin-top:14px;" class="rule-card rule-mcc">
+            <div style="font-size:11.5px;font-weight:800;color:var(--purple);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;">Additional MCC Features</div>
+            <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label">Firm, painless, dome-shaped nodule<br/><span style="font-size:12px;color:var(--muted);">Smooth surface, uniform pink/red/purple colour</span></div><span class="chk-tag chk-tag-mcc">MCC</span></div>
+            <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label">No pigmentation variation (unlike melanoma)<br/><span style="font-size:12px;color:var(--muted);">Uniform colour — not a multi-coloured lesion</span></div><span class="chk-tag chk-tag-mcc">MCC</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WINDOW: General -->
+      <div id="sym-gen" class="sym-window card" style="display:none;margin-bottom:18px;">
+        <div class="section-title">🩺 General Symptoms (All Cancer Types)</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label">Pain / Tenderness at site<br/><span style="font-size:11px;color:var(--muted);">Any pain including on pressure</span></div><span class="chk-tag chk-tag-gen">GEN</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label">Bleeding from lesion<br/><span style="font-size:11px;color:var(--muted);">Spontaneous or after minor trauma</span></div><span class="chk-tag chk-tag-gen">GEN</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label">Ulceration present<br/><span style="font-size:11px;color:var(--muted);">Breaks in skin surface at or near lesion</span></div><span class="chk-tag chk-tag-gen">GEN</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label">Itching / Pruritus<br/><span style="font-size:11px;color:var(--muted);">Persistent itch at lesion site</span></div><span class="chk-tag chk-tag-gen">GEN</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label">Crusting / scabbing<br/><span style="font-size:11px;color:var(--muted);">Dried blood or serum on surface</span></div><span class="chk-tag chk-tag-gen">GEN</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label">Discharge / oozing<br/><span style="font-size:11px;color:var(--muted);">Any fluid discharge from lesion</span></div><span class="chk-tag chk-tag-gen">GEN</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label">Fair skin / extensive sun damage<br/><span style="font-size:11px;color:var(--muted);">History of severe sunburns</span></div><span class="chk-tag chk-tag-gen">GEN</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label">Multiple nevi (&gt; 50)<br/><span style="font-size:11px;color:var(--muted);">High mole count risk factor</span></div><span class="chk-tag chk-tag-gen">GEN</span></div>
+          <div class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div><div class="chk-label">Palpable lymph nodes nearby<br/><span style="font-size:11px;color:var(--muted);">Regional lymph node enlargement</span></div><span class="chk-tag chk-tag-gen">GEN</span></div>
+        </div>
+      </div>
+
+      <!-- vector preview (always visible) -->
+      <div class="card" style="margin-bottom:18px;">
+        <div class="section-title">🧮 Symptom Vector Preview</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">14-dimensional binary vector encoded across all windows and fed to the Symptom MLP</div>
+        <div style="font-family:monospace;font-size:13px;background:var(--p900);color:var(--p300);padding:14px 18px;border-radius:var(--r-sm);line-height:2;word-break:break-all;">
+          <span style="color:rgba(255,255,255,.4);">// symptom_vector[14]</span><br/>
+          [ <span style="color:#64B5F6;">0</span>, <span style="color:#A5D6A7;">1</span>, <span style="color:#A5D6A7;">1</span>, <span style="color:#64B5F6;">0</span>, <span style="color:#64B5F6;">0</span>, <span style="color:#A5D6A7;">0.58</span>, <span style="color:#A5D6A7;">0.50</span>, <span style="color:#A5D6A7;">1</span>, <span style="color:#64B5F6;">0</span>, <span style="color:#64B5F6;">0</span>, <span style="color:#64B5F6;">0</span>, <span style="color:#A5D6A7;">1</span>, <span style="color:#A5D6A7;">1</span>, <span style="color:#64B5F6;">0</span> ]<br/>
+          <span style="color:rgba(255,255,255,.35);font-size:11px;">// [pain, bleed, ulcer, itch, nail, duration_norm, growth_speed, sun_exp, immuno, fam_hx, moles_50+, age_50+, fair_skin, prev_ca]</span>
+        </div>
+      </div>
+
+      <div class="flex-between">
+        <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
+        <button class="btn btn-primary btn-lg" onclick="goStep(4)">Submit for AI Analysis 🧠</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: AI ANALYSIS -->
+    <div id="ast-4" style="display:none;">
+      <div class="flex-between" style="margin-bottom:20px;">
+        <div class="page-header" style="margin-bottom:0;"><div class="page-title">Step 4 — AI Inference Engine</div><div class="page-sub">EfficientNet-B4 + Symptom MLP · Late Fusion · Patient: <span id="ai-patient-name">Kasun Perera</span></div></div>
+        <span class="badge badge-primary" style="font-size:12px;">4 of 5</span>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <div style="text-align:center;padding:20px 0 24px;">
+            <div class="ai-spinner" id="ai-spin"></div>
+            <div style="font-size:20px;font-weight:800;color:var(--p800);margin-bottom:8px;" id="ai-main-status">Initialising AI Engine...</div>
+            <div style="font-size:13px;color:var(--muted);" id="ai-main-sub">DermAI v1.0.0 · EfficientNet-B4 backbone</div>
+          </div>
+          <div id="ai-task-1" class="ai-task idle"><div class="ai-task-icon">🖼️</div><div><div class="ai-task-title">Image Preprocessing &amp; CNN Feature Extraction</div><div class="ai-task-detail">EXIF strip → DullRazor → resize 299×299 → normalize → EfficientNet-B4 → 1792-dim feature vector</div></div></div>
+          <div id="ai-task-2" class="ai-task idle"><div class="ai-task-icon">📊</div><div><div class="ai-task-title">Symptom Vector Encoding (MLP)</div><div class="ai-task-detail">14-dim clinical vector → MLP [128→64→32] → probability distribution</div></div></div>
+          <div id="ai-task-3" class="ai-task idle"><div class="ai-task-icon">⚡</div><div><div class="ai-task-title">Late Fusion (70% CNN + 30% MLP)</div><div class="ai-task-detail">Weighted combination of image and symptom model outputs</div></div></div>
+          <div id="ai-task-4" class="ai-task idle"><div class="ai-task-icon">🔮</div><div><div class="ai-task-title">Cancer Type Classification</div><div class="ai-task-detail">4-class softmax: MEL · BCC · SCC · MCC probability scores</div></div></div>
+          <div id="ai-task-5" class="ai-task idle"><div class="ai-task-icon">📈</div><div><div class="ai-task-title">Stage Prediction</div><div class="ai-task-detail">Multi-task learning → Early / Intermediate / Advanced classification</div></div></div>
+          <div id="ai-task-6" class="ai-task idle"><div class="ai-task-icon">🔥</div><div><div class="ai-task-title">Grad-CAM Heatmap Generation</div><div class="ai-task-detail">Gradient-weighted class activation mapping for visual explanation</div></div></div>
+          <div id="ai-task-7" class="ai-task idle"><div class="ai-task-icon">🚦</div><div><div class="ai-task-title">Urgency Classification &amp; Report</div><div class="ai-task-detail">Routine / Urgent / Emergency triage → diagnostic report compile</div></div></div>
+          <div style="margin-top:16px;">
+            <div style="background:var(--p100);border-radius:4px;height:8px;overflow:hidden;margin-bottom:6px;"><div id="ai-pbar" style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--p800),var(--p300));width:0%;transition:width .6s;"></div></div>
+            <div class="flex-between"><span id="ai-status-lbl" style="font-size:12px;font-weight:700;color:var(--p800);">Waiting...</span><span id="ai-pct-lbl" style="font-size:13px;font-weight:800;color:var(--p800);">0%</span></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div class="card">
+            <div class="section-title">📡 Live Probability Feed</div>
+            <div class="section-sub">Updates in real-time as inference progresses</div>
+            <div class="prob-row"><div class="prob-header"><span class="prob-name" style="color:var(--red);">Melanoma</span><span class="prob-pct" id="mel-live" style="color:var(--red);">—</span></div><div class="prob-track"><div class="prob-fill fill-mel" id="mel-bar" style="width:0%"></div></div></div>
+            <div class="prob-row"><div class="prob-header"><span class="prob-name" style="color:var(--amber);">Squamous Cell Ca.</span><span class="prob-pct" id="scc-live" style="color:var(--amber);">—</span></div><div class="prob-track"><div class="prob-fill fill-scc" id="scc-bar" style="width:0%"></div></div></div>
+            <div class="prob-row"><div class="prob-header"><span class="prob-name" style="color:var(--p700);">Basal Cell Ca.</span><span class="prob-pct" id="bcc-live" style="color:var(--p700);">—</span></div><div class="prob-track"><div class="prob-fill fill-bcc" id="bcc-bar" style="width:0%"></div></div></div>
+            <div class="prob-row"><div class="prob-header"><span class="prob-name" style="color:var(--purple);">Merkel Cell Ca.</span><span class="prob-pct" id="mcc-live" style="color:var(--purple);">—</span></div><div class="prob-track"><div class="prob-fill fill-mcc" id="mcc-bar" style="width:0%"></div></div></div>
+          </div>
+          <div class="card">
+            <div class="section-title">⚙️ Inference Details</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div class="qa-row pending" id="inf-cnn"><span class="qa-label">CNN Inference</span><span class="badge badge-neutral" id="inf-cnn-s">Pending</span></div>
+              <div class="qa-row pending" id="inf-mlp"><span class="qa-label">MLP Inference</span><span class="badge badge-neutral" id="inf-mlp-s">Pending</span></div>
+              <div class="qa-row pending" id="inf-fusion"><span class="qa-label">Fusion Layer</span><span class="badge badge-neutral" id="inf-fusion-s">Pending</span></div>
+              <div class="qa-row pending" id="inf-stage"><span class="qa-label">Stage Model</span><span class="badge badge-neutral" id="inf-stage-s">Pending</span></div>
+              <div class="qa-row pending" id="inf-cam"><span class="qa-label">Grad-CAM Map</span><span class="badge badge-neutral" id="inf-cam-s">Pending</span></div>
+              <div class="qa-row pending" id="inf-total"><span class="qa-label">Total Inference Time</span><span class="badge badge-neutral" id="inf-total-s">—</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="section-title">🔧 Model Configuration</div>
+            <div style="font-size:12.5px;color:var(--muted);display:grid;gap:6px;">
+              <div class="flex-between"><span>Backbone</span><strong style="color:var(--p800);">EfficientNet-B4</strong></div>
+              <div class="flex-between"><span>Symptom Model</span><strong style="color:var(--p800);">MLP [128→64→32]</strong></div>
+              <div class="flex-between"><span>Fusion</span><strong style="color:var(--p800);">Late Fusion 70/30</strong></div>
+              <div class="flex-between"><span>Loss</span><strong style="color:var(--p800);">Focal Loss γ=2.0</strong></div>
+              <div class="flex-between"><span>Explainability</span><strong style="color:var(--p800);">Grad-CAM</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5: RESULTS -->
+    <div id="ast-5" style="display:none;">
+      <div class="flex-between" style="margin-bottom:16px;">
+        <div class="page-header" style="margin-bottom:0;"><div class="page-title">Step 5 — Diagnosis Results</div><div class="page-sub">AI Assessment Complete · Patient: Kasun Perera · 01 Mar 2026, 14:32</div></div>
+        <span class="badge badge-primary" style="font-size:12px;">5 of 5 — Complete</span>
+      </div>
+
+      <div class="disclaimer-bar">
+        <span style="font-size:22px;flex-shrink:0;">⚕️</span>
+        <span><strong>MANDATORY CLINICAL DISCLAIMER:</strong> This AI tool provides clinical decision support only. No skin cancer type can be confirmed without histopathology (biopsy) and specialist evaluation. All outputs are risk probability estimates and do NOT constitute a definitive medical diagnosis. This report must be reviewed and acted upon by a qualified medical professional.</span>
+      </div>
+
+      <div class="urgency-banner urgency-urgent">
+        <div>
+          <div class="urgency-lbl">⚠️ URGENT DERMATOLOGY REFERRAL</div>
+          <div class="urgency-desc">Significant risk detected. Dermatology appointment recommended within 2 weeks.<br/>Punch biopsy is strongly recommended to confirm diagnosis.</div>
+        </div>
+        <div style="text-align:right;color:rgba(255,255,255,.9);flex-shrink:0;font-size:12px;line-height:1.7;">Patient: Kasun Perera<br/>01 Mar 2026 · 14:32 LKT<br/>Report: RPT-2026-0301-001</div>
+      </div>
+
+      <div class="g4" style="margin-bottom:22px;">
+        <div class="gauge-card">
+          <div class="gauge-type" style="color:var(--red);">🔴 Melanoma</div>
+          <svg class="gauge-svg" viewBox="0 0 110 66">
+            <path d="M12,54 A42,42 0 0,1 98,54" fill="none" stroke="#FFEBEE" stroke-width="11" stroke-linecap="round"/>
+            <path d="M12,54 A42,42 0 0,1 98,54" fill="none" stroke="#C62828" stroke-width="11" stroke-linecap="round" stroke-dasharray="131.9" stroke-dashoffset="50"/>
+            <text x="55" y="50" text-anchor="middle" font-size="20" font-weight="900" fill="#C62828" font-family="DM Sans">62%</text>
+          </svg>
+          <div style="margin:8px 0;"><span class="badge badge-warning">MEDIUM RISK</span></div>
+          <div style="font-size:11px;color:var(--muted);">ABCDE: 3/5 positive</div>
+          <div style="font-size:11px;color:var(--muted);">Blue-white veil detected</div>
+        </div>
+        <div class="gauge-card">
+          <div class="gauge-type" style="color:var(--amber);">🟠 SCC</div>
+          <svg class="gauge-svg" viewBox="0 0 110 66">
+            <path d="M12,54 A42,42 0 0,1 98,54" fill="none" stroke="#FFF3E0" stroke-width="11" stroke-linecap="round"/>
+            <path d="M12,54 A42,42 0 0,1 98,54" fill="none" stroke="#E65100" stroke-width="11" stroke-linecap="round" stroke-dasharray="131.9" stroke-dashoffset="73"/>
+            <text x="55" y="50" text-anchor="middle" font-size="20" font-weight="900" fill="#E65100" font-family="DM Sans">45%</text>
+          </svg>
+          <div style="margin:8px 0;"><span class="badge badge-warning">MEDIUM RISK</span></div>
+          <div style="font-size:11px;color:var(--muted);">Pain + ulceration present</div>
+          <div style="font-size:11px;color:var(--muted);">Sun-exposed location</div>
+        </div>
+        <div class="gauge-card">
+          <div class="gauge-type" style="color:var(--p700);">🔵 BCC</div>
+          <svg class="gauge-svg" viewBox="0 0 110 66">
+            <path d="M12,54 A42,42 0 0,1 98,54" fill="none" stroke="#E3F2FD" stroke-width="11" stroke-linecap="round"/>
+            <path d="M12,54 A42,42 0 0,1 98,54" fill="none" stroke="#1565C0" stroke-width="11" stroke-linecap="round" stroke-dasharray="131.9" stroke-dashoffset="108"/>
+            <text x="55" y="50" text-anchor="middle" font-size="20" font-weight="900" fill="#1565C0" font-family="DM Sans">18%</text>
+          </svg>
+          <div style="margin:8px 0;"><span class="badge badge-success">LOW RISK</span></div>
+          <div style="font-size:11px;color:var(--muted);">No pearly/rolled features</div>
+          <div style="font-size:11px;color:var(--muted);">Low BCC probability</div>
+        </div>
+        <div class="gauge-card">
+          <div class="gauge-type" style="color:var(--purple);">🟣 MCC</div>
+          <svg class="gauge-svg" viewBox="0 0 110 66">
+            <path d="M12,54 A42,42 0 0,1 98,54" fill="none" stroke="#F3E5F5" stroke-width="11" stroke-linecap="round"/>
+            <path d="M12,54 A42,42 0 0,1 98,54" fill="none" stroke="#7B1FA2" stroke-width="11" stroke-linecap="round" stroke-dasharray="131.9" stroke-dashoffset="120"/>
+            <text x="55" y="50" text-anchor="middle" font-size="20" font-weight="900" fill="#7B1FA2" font-family="DM Sans">9%</text>
+          </svg>
+          <div style="margin:8px 0;"><span class="badge badge-success">LOW RISK</span></div>
+          <div style="font-size:11px;color:var(--muted);">AEIOU: 1/5 positive</div>
+          <div style="font-size:11px;color:var(--muted);">Slow-expanding lesion</div>
+        </div>
+      </div>
+
+      <div class="g2" style="margin-bottom:20px;">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🔥 Grad-CAM Visual Explanation</div><span class="badge badge-primary">EfficientNet-B4</span></div>
+          <div class="heatmap-viewer">
+            <div class="heatmap-tabs">
+              <div class="htab active" onclick="selHTab(this,'orig')">Original</div>
+              <div class="htab" onclick="selHTab(this,'heat')">Heatmap</div>
+              <div class="htab" onclick="selHTab(this,'overlay')">Overlay</div>
+            </div>
+            <div id="ht-orig" class="heatmap-img" style="background:linear-gradient(135deg,#455A64,#607D8B);">🩺</div>
+            <div id="ht-heat" class="heatmap-img" style="display:none;background:linear-gradient(135deg,#0D47A1,#4A148C,#C62828,#FF7043);">🩺<div style="position:absolute;inset:0;background:radial-gradient(ellipse 55% 38% at 56% 47%,rgba(198,40,40,.78),rgba(255,152,0,.5),rgba(76,175,80,.1));pointer-events:none;"></div></div>
+            <div id="ht-overlay" class="heatmap-img" style="display:none;background:linear-gradient(135deg,#455A64,#607D8B);">🩺<div style="position:absolute;inset:0;background:radial-gradient(ellipse 55% 38% at 56% 47%,rgba(198,40,40,.52),rgba(255,152,0,.32),rgba(76,175,80,.05));pointer-events:none;"></div></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:11px;font-weight:700;">
+              <span style="color:var(--p700);">Low</span>
+              <div style="flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,#1565C0,#FDD835,#C62828);"></div>
+              <span style="color:var(--red);">High Attention</span>
+            </div>
+          </div>
+          <div class="alert alert-info" style="margin-top:10px;font-size:12px;">🔴 Red regions = AI's highest-attention areas for classification decision. The irregular border and colour heterogeneity are the primary signals.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px;">📊 Stage Prediction</div>
+          <div class="stage-line">
+            <div class="stage-node"><div class="stage-circ done">✓</div><div class="stage-lbl" style="color:var(--green);">Early</div></div>
+            <div class="stage-conn filled"></div>
+            <div class="stage-node"><div class="stage-circ current">●</div><div class="stage-lbl" style="color:var(--amber);">Intermediate</div></div>
+            <div class="stage-conn empty"></div>
+            <div class="stage-node"><div class="stage-circ future">○</div><div class="stage-lbl">Advanced</div></div>
+          </div>
+          <div class="alert alert-warn" style="margin:14px 0;">
+            <strong>Stage: Intermediate</strong> · Confidence: 71.4%<br/>
+            <span style="font-size:12.5px;">Lesion characteristics indicate progression beyond early stage. Urgent specialist review and biopsy recommended within 2 weeks.</span>
+          </div>
+          <div class="card-title" style="margin-bottom:10px;">⚡ Overall Risk Score</div>
+          <div class="risk-meter"><div class="risk-needle" style="left:62%"></div></div>
+          <div class="risk-labels"><span style="color:var(--green);">Low</span><span style="color:#FDD835;">Medium</span><span style="color:var(--amber);">High</span><span style="color:var(--red);">Critical</span></div>
+          <div style="text-align:center;margin-top:12px;"><span class="badge badge-warning" style="font-size:14px;padding:6px 16px;">Overall Risk: 62% — MEDIUM-HIGH</span></div>
+          <div style="margin-top:18px;">
+            <div class="card-title" style="margin-bottom:10px;">📋 Key Clinical Flags</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <span class="badge badge-danger">A Asymmetry ✓</span>
+              <span class="badge badge-danger">B Border ✓</span>
+              <span class="badge badge-danger">C Colour ✓</span>
+              <span class="badge badge-warning">E Evolving ✓</span>
+              <span class="badge badge-danger">Bleeding ✓</span>
+              <span class="badge badge-danger">Ulceration ✓</span>
+              <span class="badge badge-warning">Blue-white veil ✓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title" style="margin-bottom:16px;">📈 Full Cancer Classification Probabilities</div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr><th>Cancer Type</th><th>AI Probability</th><th>Risk Level</th><th>Key Features</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td><strong style="color:var(--red);">🔴 Melanoma</strong></td><td><strong style="color:var(--red);font-size:16px;">62%</strong></td><td><span class="badge badge-warning">MEDIUM RISK</span></td><td style="font-size:12.5px;">ABCDE 3/5 · Blue-white veil · Colour heterogeneity · Asymmetric shape</td><td><span class="badge badge-warning">URGENT BIOPSY</span></td></tr>
+              <tr><td><strong style="color:var(--amber);">🟠 Squamous Cell Ca.</strong></td><td><strong style="color:var(--amber);font-size:16px;">45%</strong></td><td><span class="badge badge-warning">MEDIUM RISK</span></td><td style="font-size:12.5px;">Bleeding · Ulceration · Sun-exposed · Crusted texture</td><td><span class="badge badge-warning">URGENT REVIEW</span></td></tr>
+              <tr><td><strong style="color:var(--p700);">🔵 Basal Cell Ca.</strong></td><td><strong style="color:var(--p700);font-size:16px;">18%</strong></td><td><span class="badge badge-success">LOW RISK</span></td><td style="font-size:12.5px;">No rolled border · No telangiectasia · No pearly surface</td><td><span class="badge badge-neutral">ROUTINE MONITOR</span></td></tr>
+              <tr><td><strong style="color:var(--purple);">🟣 Merkel Cell Ca.</strong></td><td><strong style="color:var(--purple);font-size:16px;">9%</strong></td><td><span class="badge badge-success">LOW RISK</span></td><td style="font-size:12.5px;">AEIOU 1/5 · No rapid expansion confirmed · Not dome-shaped</td><td><span class="badge badge-neutral">ROUTINE MONITOR</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px;">🩺 Clinical Recommendation</div>
+        <div class="alert alert-warn" style="margin-bottom:16px;">
+          AI analysis indicates significant risk consistent with <strong>Melanoma (62%)</strong> and SCC (45%). Presence of ABCDE-positive features (3/5) combined with active symptoms (bleeding, ulceration) warrants <strong>urgent dermatological evaluation within 2 weeks</strong>. Punch biopsy is strongly recommended to confirm diagnosis, assess invasion depth, and determine treatment pathway.
+        </div>
+        <div class="flex-between" style="flex-wrap:wrap;gap:12px;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-lg" onclick="go('report')">📄 View Full Report</button>
+            <button class="btn btn-secondary" onclick="showToast('Report emailed to Dr. Perera','success')">📧 Email Report</button>
+            <button class="btn btn-outline" onclick="showToast('Printing report...','info')">🖨️ Print</button>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-outline" onclick="resetAssessment()">🔬 New Assessment</button>
+            <button class="btn btn-ghost" onclick="go('dashboard')">← Dashboard</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end page-body -->
+  <div class="qc-footer">Quantum Coders · DermAI v1.0.0 · Results require biopsy confirmation — not a substitute for specialist evaluation</div>
+</div><!-- end assessment screen -->
+
+<!-- REPORT SCREEN -->
+<div id="scr-report" class="screen">
+  <nav class="topnav">
+    <div class="nav-brand" onclick="go('dashboard')"><div class="nav-logo">🔬</div><div><div class="nav-brand-text">DermAI</div><div class="nav-brand-sub">Diagnostic Report</div></div></div>
+    <div class="nav-links"><button class="nav-link" onclick="go('dashboard')">🏠 Dashboard</button><button class="nav-link" onclick="goResultsFromReport()">← Results</button></div>
+    <div class="nav-right">
+      <button class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,.4);" onclick="showToast('Print dialog opened','info')">🖨️ Print</button>
+      <button class="btn btn-secondary btn-sm" onclick="showToast('PDF downloaded successfully','success')">📥 Download PDF</button>
+      <div class="nav-avatar" id="rp-av">AP</div>
+    </div>
+  </nav>
+  <div class="page-body" style="max-width:880px;">
+    <div class="report-doc">
+      <div class="report-hdr">
+        <div><div style="font-family:'DM Serif Display',serif;font-size:22px;">DermAI — Skin Cancer Assessment Report</div><div style="font-size:12px;opacity:.75;margin-top:4px;">Quantum Coders · Faculty of Applied Sciences · Rajarata University of Sri Lanka</div></div>
+        <div style="text-align:right;font-size:11.5px;opacity:.8;line-height:1.8;"><div>Report #RPT-2026-0301-001</div><div>01 March 2026 · 14:32 LKT</div><div>DermAI Model v1.0.0</div></div>
+      </div>
+      <div class="report-sec">
+        <div class="rsec-title">👤 Patient Information</div>
+        <div class="g2">
+          <div><div class="rfield"><span class="rfield-key">Full Name</span><span class="rfield-val">Kasun Perera</span></div><div class="rfield"><span class="rfield-key">Age / Gender</span><span class="rfield-val">54 / Male</span></div><div class="rfield"><span class="rfield-key">Fitzpatrick Type</span><span class="rfield-val">Type IV (Olive — South Asian)</span></div><div class="rfield"><span class="rfield-key">Lesion Location</span><span class="rfield-val">Back (dorsal)</span></div></div>
+          <div><div class="rfield"><span class="rfield-key">Duration</span><span class="rfield-val">8 weeks</span></div><div class="rfield"><span class="rfield-key">Growth Speed</span><span class="rfield-val">Moderate</span></div><div class="rfield"><span class="rfield-key">Attending Doctor</span><span class="rfield-val">Dr. A. Perera · SLMC-29441</span></div><div class="rfield"><span class="rfield-key">Report Date</span><span class="rfield-val">01 March 2026</span></div></div>
+        </div>
+      </div>
+      <div class="report-sec">
+        <div class="rsec-title">🔬 AI Cancer Classification Probabilities</div>
+        <div style="margin-bottom:14px;">
+          <div class="prob-row"><div class="prob-header"><span class="prob-name" style="color:var(--red);">Melanoma</span><span class="prob-pct" style="color:var(--red);">62.0%</span></div><div class="prob-track"><div class="prob-fill fill-mel" style="width:62%"></div></div></div>
+          <div class="prob-row"><div class="prob-header"><span class="prob-name" style="color:var(--amber);">Squamous Cell Carcinoma</span><span class="prob-pct" style="color:var(--amber);">45.0%</span></div><div class="prob-track"><div class="prob-fill fill-scc" style="width:45%"></div></div></div>
+          <div class="prob-row"><div class="prob-header"><span class="prob-name" style="color:var(--p700);">Basal Cell Carcinoma</span><span class="prob-pct" style="color:var(--p700);">18.0%</span></div><div class="prob-track"><div class="prob-fill fill-bcc" style="width:18%"></div></div></div>
+          <div class="prob-row"><div class="prob-header"><span class="prob-name" style="color:var(--purple);">Merkel Cell Carcinoma</span><span class="prob-pct" style="color:var(--purple);">9.0%</span></div><div class="prob-track"><div class="prob-fill fill-mcc" style="width:9%"></div></div></div>
+        </div>
+        <div class="g2">
+          <div><div class="rfield"><span class="rfield-key">Predicted Stage</span><span><span class="badge badge-warning">Intermediate</span></span></div><div class="rfield"><span class="rfield-key">Stage Confidence</span><span class="rfield-val">71.4%</span></div><div class="rfield"><span class="rfield-key">Urgency Level</span><span><span class="badge badge-warning">URGENT</span></span></div></div>
+          <div><div class="rfield"><span class="rfield-key">Overall Risk Score</span><span class="rfield-val" style="color:var(--amber);">62% — Medium-High</span></div><div class="rfield"><span class="rfield-key">Model Confidence</span><span class="rfield-val">62.0%</span></div><div class="rfield"><span class="rfield-key">Fusion Weights</span><span class="rfield-val">CNN 70% + MLP 30%</span></div></div>
+        </div>
+      </div>
+      <div class="report-sec">
+        <div class="rsec-title">📋 Symptom Analysis</div>
+        <div class="g2">
+          <div>
+            <div style="font-size:11px;font-weight:900;color:var(--p800);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px;">ABCDE — Melanoma Criteria</div>
+            <div class="rfield"><span class="rfield-key">A — Asymmetry</span><span class="badge badge-danger">POSITIVE</span></div>
+            <div class="rfield"><span class="rfield-key">B — Border Irregularity</span><span class="badge badge-danger">POSITIVE</span></div>
+            <div class="rfield"><span class="rfield-key">C — Colour Variation</span><span class="badge badge-danger">POSITIVE</span></div>
+            <div class="rfield"><span class="rfield-key">D — Diameter &gt;6mm</span><span class="badge badge-neutral">NEGATIVE</span></div>
+            <div class="rfield"><span class="rfield-key">E — Evolving</span><span class="badge badge-danger">POSITIVE</span></div>
+            <div class="rfield"><span class="rfield-key">Blue-white veil</span><span class="badge badge-danger">POSITIVE</span></div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:900;color:var(--p800);margin-bottom:8px;text-transform:uppercase;letter-spacing:.6px;">General Symptoms &amp; Risk Factors</div>
+            <div class="rfield"><span class="rfield-key">Pain / Tenderness</span><span class="badge badge-neutral">NONE</span></div>
+            <div class="rfield"><span class="rfield-key">Bleeding</span><span class="badge badge-danger">PRESENT</span></div>
+            <div class="rfield"><span class="rfield-key">Ulceration</span><span class="badge badge-danger">PRESENT</span></div>
+            <div class="rfield"><span class="rfield-key">Sun Exposure History</span><span class="badge badge-warning">SIGNIFICANT</span></div>
+            <div class="rfield"><span class="rfield-key">Immunosuppression</span><span class="badge badge-neutral">NONE</span></div>
+            <div class="rfield"><span class="rfield-key">Family History</span><span class="badge badge-neutral">NONE</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="report-sec">
+        <div class="rsec-title">🩺 Clinical Recommendation</div>
+        <div class="alert alert-warn">AI analysis indicates significant risk consistent with <strong>Melanoma (62%)</strong> and SCC (45%). Presence of ABCDE-positive features (3/5) combined with active symptoms (bleeding, ulceration) warrants <strong>urgent dermatological evaluation within 2 weeks</strong>. Punch biopsy is strongly recommended to confirm diagnosis, assess invasion depth (Breslow thickness), and determine definitive treatment pathway including staging workup (sentinel node biopsy if applicable).</div>
+      </div>
+      <div class="report-sec" style="background:var(--red-l);">
+        <div class="rsec-title" style="color:var(--red);">⚕️ Mandatory Ethical Disclaimer</div>
+        <div style="font-size:12.5px;color:var(--neutral);line-height:1.75;">This report is generated by an AI clinical decision support system and is intended for use by licensed medical professionals only. <strong>No skin cancer type can be confirmed without histopathology (biopsy) and specialist evaluation.</strong> All probability scores are AI-generated estimates and do not constitute a definitive diagnosis. This report must be reviewed by a qualified medical professional before any clinical decision is made. DermAI by Quantum Coders is not a substitute for professional medical advice, diagnosis, or treatment. Results are valid only in conjunction with full clinical assessment.</div>
+      </div>
+    </div>
+    <div class="flex-end" style="margin-top:16px;gap:10px;">
+      <button class="btn btn-outline" onclick="goResultsFromReport()">← Back to Results</button>
+      <button class="btn btn-secondary" onclick="resetAssessment()">🔬 New Assessment</button>
+      <button class="btn btn-primary" onclick="showToast('PDF downloaded','success')">📥 Download PDF</button>
+    </div>
+  </div>
+  <div class="qc-footer">Quantum Coders · DermAI v1.0.0 · All diagnoses require biopsy confirmation</div>
+</div>
+
+<!-- PATIENT RECORDS -->
+<div id="scr-records" class="screen">
+  <nav class="topnav">
+    <div class="nav-brand" onclick="go('dashboard')"><div class="nav-logo">🔬</div><div><div class="nav-brand-text">DermAI</div><div class="nav-brand-sub">Patient Records</div></div></div>
+    <div class="nav-links"><button class="nav-link" onclick="go('dashboard')">🏠 Dashboard</button><button class="nav-link" onclick="go('assessment')">🔬 New Assessment</button><button class="nav-link active">📋 Records</button><button class="nav-link" onclick="go('profile')">👤 Profile</button></div>
+    <div class="nav-right"><div class="nav-avatar" id="rec-av">AP</div><button class="btn btn-ghost" style="color:rgba(255,255,255,.6);font-size:13px;" onclick="doLogout()">Sign Out</button></div>
+  </nav>
+  <div class="page-body">
+    <div class="flex-between" style="margin-bottom:20px;"><div class="page-header" style="margin-bottom:0;"><div class="page-title">Patient Records</div><div class="page-sub">47 patients · All diagnosis history</div></div><button class="btn btn-primary" onclick="go('assessment')">+ New Assessment</button></div>
+    <div class="card">
+      <div class="search-bar">
+        <input class="search-input" placeholder="🔍 Search patient name, ID, or cancer type..." oninput="filterRec(this.value)"/>
+        <select class="filter-sel"><option>All Types</option><option>Melanoma</option><option>BCC</option><option>SCC</option><option>MCC</option></select>
+        <select class="filter-sel"><option>All Stages</option><option>Early</option><option>Intermediate</option><option>Advanced</option></select>
+        <select class="filter-sel"><option>All Urgency</option><option>Emergency</option><option>Urgent</option><option>Routine</option></select>
+      </div>
+      <div class="tbl-wrap"><table><thead><tr><th>Patient</th><th>Age/Gender</th><th>Type</th><th>Stage</th><th>Confidence</th><th>Urgency</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody id="rec-tbody">
+        <tr><td><div class="td-name">Kasun Perera</div><div class="td-sub">PAT-001</div></td><td>54 / M</td><td>Melanoma</td><td><span class="badge badge-warning">Intermediate</span></td><td><strong style="color:var(--amber);">62%</strong></td><td><span class="badge badge-warning">URGENT</span></td><td style="font-size:12px;">01 Mar 2026</td><td><div style="display:flex;gap:5px;"><button class="btn btn-xs btn-secondary" onclick="go('assessment');setTimeout(()=>showStep(5),120)">View</button><button class="btn btn-xs btn-outline" onclick="go('report')">PDF</button></div></td></tr>
+        <tr><td><div class="td-name">Nimal Bandara</div><div class="td-sub">PAT-002</div></td><td>67 / M</td><td>MCC</td><td><span class="badge badge-danger">Advanced</span></td><td><strong style="color:var(--red);">78%</strong></td><td><span class="badge badge-danger">EMERGENCY</span></td><td style="font-size:12px;">28 Feb 2026</td><td><div style="display:flex;gap:5px;"><button class="btn btn-xs btn-secondary">View</button><button class="btn btn-xs btn-outline">PDF</button></div></td></tr>
+        <tr><td><div class="td-name">Chamara Silva</div><div class="td-sub">PAT-003</div></td><td>42 / F</td><td>BCC</td><td><span class="badge badge-success">Early</span></td><td><strong style="color:var(--green);">81%</strong></td><td><span class="badge badge-neutral">ROUTINE</span></td><td style="font-size:12px;">25 Feb 2026</td><td><div style="display:flex;gap:5px;"><button class="btn btn-xs btn-secondary">View</button><button class="btn btn-xs btn-outline">PDF</button></div></td></tr>
+        <tr><td><div class="td-name">Priyantha Wijesekara</div><div class="td-sub">PAT-004</div></td><td>58 / M</td><td>SCC</td><td><span class="badge badge-warning">Intermediate</span></td><td><strong style="color:var(--amber);">55%</strong></td><td><span class="badge badge-warning">URGENT</span></td><td style="font-size:12px;">24 Feb 2026</td><td><div style="display:flex;gap:5px;"><button class="btn btn-xs btn-secondary">View</button><button class="btn btn-xs btn-outline">PDF</button></div></td></tr>
+        <tr><td><div class="td-name">Sandya Gunawardena</div><div class="td-sub">PAT-005</div></td><td>35 / F</td><td>Melanoma</td><td><span class="badge badge-danger">Advanced</span></td><td><strong style="color:var(--red);">87%</strong></td><td><span class="badge badge-danger">EMERGENCY</span></td><td style="font-size:12px;">20 Feb 2026</td><td><div style="display:flex;gap:5px;"><button class="btn btn-xs btn-secondary">View</button><button class="btn btn-xs btn-outline">PDF</button></div></td></tr>
+        <tr><td><div class="td-name">Roshan Fernando</div><div class="td-sub">PAT-006</div></td><td>49 / M</td><td>BCC</td><td><span class="badge badge-success">Early</span></td><td><strong style="color:var(--green);">73%</strong></td><td><span class="badge badge-neutral">ROUTINE</span></td><td style="font-size:12px;">18 Feb 2026</td><td><div style="display:flex;gap:5px;"><button class="btn btn-xs btn-secondary">View</button><button class="btn btn-xs btn-outline">PDF</button></div></td></tr>
+        <tr><td><div class="td-name">Tharanga Rathnayake</div><div class="td-sub">PAT-007</div></td><td>61 / M</td><td>SCC</td><td><span class="badge badge-danger">Advanced</span></td><td><strong style="color:var(--red);">71%</strong></td><td><span class="badge badge-danger">EMERGENCY</span></td><td style="font-size:12px;">15 Feb 2026</td><td><div style="display:flex;gap:5px;"><button class="btn btn-xs btn-secondary">View</button><button class="btn btn-xs btn-outline">PDF</button></div></td></tr>
+      </tbody></table></div>
+      <div class="flex-between" style="margin-top:14px;"><div style="font-size:12.5px;color:var(--muted);">Showing 7 of 47 patients</div><div class="pagination"><div class="pg-btn">←</div><div class="pg-btn active">1</div><div class="pg-btn">2</div><div class="pg-btn">3</div><div class="pg-btn">…</div><div class="pg-btn">7</div><div class="pg-btn">→</div></div></div>
+    </div>
+  </div>
+  <div class="qc-footer">Quantum Coders · DermAI v1.0.0</div>
+</div>
+
+<!-- PROFILE -->
+<div id="scr-profile" class="screen">
+  <nav class="topnav">
+    <div class="nav-brand" onclick="go('dashboard')"><div class="nav-logo">🔬</div><div><div class="nav-brand-text">DermAI</div><div class="nav-brand-sub">My Profile</div></div></div>
+    <div class="nav-links"><button class="nav-link" onclick="go('dashboard')">🏠 Dashboard</button><button class="nav-link" onclick="go('assessment')">🔬 New Assessment</button><button class="nav-link" onclick="go('records')">📋 Records</button><button class="nav-link active">👤 Profile</button></div>
+    <div class="nav-right"><div class="nav-avatar" id="pr-av">AP</div><button class="btn btn-ghost" style="color:rgba(255,255,255,.6);" onclick="doLogout()">Sign Out</button></div>
+  </nav>
+  <div class="page-body">
+    <div class="profile-hero">
+      <div class="profile-av" id="pr-av-big">AP</div>
+      <div>
+        <div style="font-size:22px;font-weight:800;margin-bottom:4px;" id="pr-name">Dr. Asha Perera</div>
+        <div style="font-size:13px;opacity:.8;">Dermatologist · SLMC-29441 · asha.perera@hospital.lk</div>
+        <div style="display:flex;gap:8px;margin-top:12px;"><span class="badge" style="background:rgba(255,255,255,.2);color:#fff;">● Active</span><span class="badge" style="background:rgba(255,255,255,.2);color:#fff;">✓ Verified</span><span class="badge" style="background:rgba(255,255,255,.2);color:#fff;">Since Jan 2025</span></div>
+      </div>
+    </div>
+    <div class="g2">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="card"><div class="card-title" style="margin-bottom:16px;">👤 Personal Information</div>
+          <div class="input-row"><div class="fgroup"><label class="flabel">First Name</label><input class="finput" value=""/></div><div class="fgroup"><label class="flabel">Last Name</label><input class="finput" value=""/></div></div>
+          <div class="fgroup"><label class="flabel">Email</label><input class="finput" type="email" value=""/></div>
+          <div class="fgroup"><label class="flabel">SLMC No.</label><input class="finput" value="" readonly style="background:var(--surface);color:var(--muted);"/></div>
+          <div class="fgroup"><label class="flabel">Specialization</label><select class="finput"><option>Dermatologist</option><option>General Practitioner</option><option>Oncologist</option></select></div>
+          <div class="flex-end"><button class="btn btn-outline">Cancel</button><button class="btn btn-primary" onclick="showToast('Profile updated','success')">Save Changes</button></div>
+        </div>
+        <div class="card"><div class="card-title" style="margin-bottom:14px;">📊 My Statistics</div>
+          <div class="rfield"><span class="rfield-key">Total Patients</span><span class="rfield-val">47</span></div>
+          <div class="rfield"><span class="rfield-key">Reports Generated</span><span class="rfield-val">38</span></div>
+          <div class="rfield"><span class="rfield-key">Emergency Cases</span><span class="rfield-val" style="color:var(--red);">3</span></div>
+          <div class="rfield"><span class="rfield-key">Urgent Cases</span><span class="rfield-val" style="color:var(--amber);">14</span></div>
+          <div class="rfield"><span class="rfield-key">Routine Cases</span><span class="rfield-val" style="color:var(--green);">30</span></div>
+          <div class="rfield"><span class="rfield-key">Active Since</span><span class="rfield-val">January 2025</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="card"><div class="card-title" style="margin-bottom:16px;">🔐 Change Password</div>
+          <div class="fgroup"><label class="flabel">Current Password</label><input class="finput" type="password" placeholder="Current password"/></div>
+          <div class="fgroup"><label class="flabel">New Password</label><input class="finput" type="password" placeholder="Min. 8 characters"/></div>
+          <div class="fgroup"><label class="flabel">Confirm New Password</label><input class="finput" type="password" placeholder="Repeat new password"/></div>
+          <button class="btn btn-primary" onclick="showToast('Password updated','success')">Update Password</button>
+        </div>
+        <div class="card" style="border:1.5px solid rgba(198,40,40,.15);">
+          <div class="card-title" style="color:var(--red);margin-bottom:14px;">⚠️ Data &amp; Account</div>
+          <button class="btn btn-secondary btn-full" style="margin-bottom:10px;" onclick="showToast('Preparing GDPR data export...','info')">📤 Export My Data (GDPR)</button>
+          <button class="btn btn-outline btn-full" style="border-color:rgba(198,40,40,.3);color:var(--red);" onclick="showDelModal()">🗑️ Delete Account</button>
+          <div style="font-size:12px;color:var(--muted);margin-top:12px;line-height:1.6;">Account deletion is permanent. All 47 records will be deleted per data retention policy.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="qc-footer">Quantum Coders · DermAI v1.0.0</div>
+</div>
+
+<!-- ADMIN CONSOLE (accessed only via the #admin endpoint) -->
+<div id="scr-admin" class="screen">
+  <nav class="topnav">
+    <div class="nav-brand"><div class="nav-logo" style="background:rgba(198,40,40,.3);">⚙️</div><div><div class="nav-brand-text">DermAI Admin</div><div class="nav-brand-sub">System Administration</div></div></div>
+    <div class="nav-right"><div style="text-align:right;"><div class="nav-user-name">System Admin</div><div class="nav-user-role">ADMIN-001</div></div><div class="nav-avatar" style="background:var(--red);">SA</div><button class="btn btn-ghost" style="color:rgba(255,255,255,.6);" onclick="doLogout()">Sign Out</button></div>
+  </nav>
+  <div class="admin-layout">
+    <div class="admin-sidebar">
+      <div style="padding:14px 22px;font-size:10px;font-weight:900;color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Admin Console</div>
+      <div class="admin-nav-item active" onclick="adminTab('users',this)">👥 User Management</div>
+      <div class="admin-nav-item" onclick="adminTab('system',this)">📊 System Stats</div>
+      <div class="admin-nav-item" onclick="adminTab('audit',this)">📋 Audit Log</div>
+      <div class="admin-nav-item" onclick="adminTab('model',this)">🧠 AI Model Info</div>
+    </div>
+    <div class="admin-body">
+      <div id="atab-users">
+        <div class="flex-between" style="margin-bottom:20px;"><div class="page-header" style="margin-bottom:0;"><div class="page-title">User Management</div></div><button class="btn btn-primary" onclick="showToast('Add user dialog','info')">+ Add User</button></div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-icon" style="background:#E8EAF6;">👥</div><div><div class="stat-value">12</div><div class="stat-label">Total Users</div></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:var(--green-l);">🟢</div><div><div class="stat-value" style="color:var(--green);">9</div><div class="stat-label">Active</div></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:var(--amber-l);">⏳</div><div><div class="stat-value" style="color:var(--amber);">2</div><div class="stat-label">Pending</div></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:var(--red-l);">🔴</div><div><div class="stat-value" style="color:var(--red);">1</div><div class="stat-label">Deactivated</div></div></div>
+        </div>
+        <div class="card">
+          <div class="search-bar"><input class="search-input" placeholder="🔍 Search users..."/><select class="filter-sel"><option>All Roles</option><option>Doctor</option><option>Admin</option></select><select class="filter-sel"><option>All Status</option><option>Active</option><option>Pending</option></select></div>
+          <div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Reg. No.</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td class="td-name">Dr. A.P. Madushani</td><td style="font-size:12px;">madushani@hospital.lk</td><td><code class="tag">SLMC-28441</code></td><td><span class="badge badge-primary">DOCTOR</span></td><td><span class="badge badge-success">● ACTIVE</span></td><td style="font-size:12px;">Jan 2025</td><td><div style="display:flex;gap:5px;"><button class="btn btn-xs btn-outline">Edit</button><button class="btn btn-xs" style="background:var(--amber-l);color:var(--amber);border:none;font-weight:800;" onclick="showToast('User deactivated','warning')">Deactivate</button></div></td></tr>
+            <tr><td class="td-name">Dr. Asha Perera</td><td style="font-size:12px;">asha.perera@hospital.lk</td><td><code class="tag">SLMC-29441</code></td><td><span class="badge badge-primary">DOCTOR</span></td><td><span class="badge badge-success">● ACTIVE</span></td><td style="font-size:12px;">Feb 2025</td><td><div style="display:flex;gap:5px;"><button class="btn btn-xs btn-outline">Edit</button><button class="btn btn-xs" style="background:var(--amber-l);color:var(--amber);border:none;font-weight:800;">Deactivate</button></div></td></tr>
+            <tr><td class="td-name">System Admin</td><td style="font-size:12px;">admin@dermai.lk</td><td><code class="tag">ADMIN-001</code></td><td><span class="badge badge-danger">ADMIN</span></td><td><span class="badge badge-success">● ACTIVE</span></td><td style="font-size:12px;">Dec 2024</td><td><div style="display:flex;gap:5px;"><button class="btn btn-xs btn-outline">Edit</button></div></td></tr>
+            <tr><td class="td-name">Dr. M.T. Rathnayake</td><td style="font-size:12px;">rathnayake@health.lk</td><td><code class="tag">SLMC-29887</code></td><td><span class="badge badge-primary">DOCTOR</span></td><td><span class="badge badge-warning">⏳ PENDING</span></td><td style="font-size:12px;">Mar 2026</td><td><div style="display:flex;gap:5px;"><button class="btn btn-xs" style="background:var(--green);color:#fff;border:none;font-weight:800;" onclick="showToast('Account verified','success')">Verify</button><button class="btn btn-xs" style="background:var(--red-l);color:var(--red);border:none;font-weight:800;" onclick="showToast('Account rejected','error')">Reject</button></div></td></tr>
+            <tr style="opacity:.6;"><td class="td-name">Dr. R. Wijesekara</td><td style="font-size:12px;">wijesekara@clinic.lk</td><td><code class="tag">SLMC-24001</code></td><td><span class="badge badge-primary">DOCTOR</span></td><td><span class="badge badge-neutral">⛔ DEACTIVATED</span></td><td style="font-size:12px;">Aug 2024</td><td><button class="btn btn-xs btn-outline" onclick="showToast('Account restored','success')">Restore</button></td></tr>
+          </tbody></table></div>
+          <div class="pagination" style="margin-top:12px;"><div class="pg-btn">←</div><div class="pg-btn active">1</div><div class="pg-btn">2</div><div class="pg-btn">→</div></div>
+        </div>
+      </div>
+      <div id="atab-system" style="display:none;">
+        <div class="page-header"><div class="page-title">System Statistics</div></div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-icon" style="background:#E8EAF6;">🔬</div><div><div class="stat-value">284</div><div class="stat-label">Total Assessments</div><div class="stat-delta delta-up">↑ 23 this week</div></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:var(--red-l);">🚨</div><div><div class="stat-value" style="color:var(--red);">8</div><div class="stat-label">Emergency Cases</div></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:var(--green-l);">📋</div><div><div class="stat-value" style="color:var(--green);">241</div><div class="stat-label">Reports</div></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:var(--amber-l);">⚡</div><div><div class="stat-value" style="color:var(--amber);">2.3s</div><div class="stat-label">Avg Inference</div></div></div>
+        </div>
+        <div class="g2">
+          <div class="card"><div class="card-title" style="margin-bottom:14px;">🧠 AI Model Performance</div>
+            <div class="rfield"><span class="rfield-key">Accuracy</span><span class="rfield-val" style="color:var(--green);">87.2%</span></div>
+            <div class="rfield"><span class="rfield-key">Melanoma F1</span><span class="rfield-val">0.84</span></div>
+            <div class="rfield"><span class="rfield-key">BCC F1</span><span class="rfield-val">0.88</span></div>
+            <div class="rfield"><span class="rfield-key">SCC F1</span><span class="rfield-val">0.82</span></div>
+            <div class="rfield"><span class="rfield-key">MCC F1</span><span class="rfield-val">0.79</span></div>
+            <div class="rfield"><span class="rfield-key">AUC-ROC</span><span class="rfield-val" style="color:var(--green);">0.92</span></div>
+          </div>
+          <div class="card"><div class="card-title" style="margin-bottom:14px;">🖥️ System Health</div>
+            <div class="rfield"><span class="rfield-key">API</span><span class="badge badge-success">● ONLINE</span></div>
+            <div class="rfield"><span class="rfield-key">Database</span><span class="badge badge-success">● HEALTHY</span></div>
+            <div class="rfield"><span class="rfield-key">AI Model Server</span><span class="badge badge-success">● ONLINE</span></div>
+            <div class="rfield"><span class="rfield-key">Storage</span><span class="rfield-val">24.7 GB / 100 GB</span></div>
+            <div class="rfield"><span class="rfield-key">Uptime</span><span class="rfield-val" style="color:var(--green);">99.97%</span></div>
+          </div>
+        </div>
+      </div>
+      <div id="atab-audit" style="display:none;">
+        <div class="page-header"><div class="page-title">Audit Log</div></div>
+        <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Details</th><th>IP</th></tr></thead>
+        <tbody>
+          <tr><td style="font-size:12px;">01 Mar 14:32</td><td style="font-size:12px;">Dr. A. Perera</td><td><span class="badge badge-primary">ASSESSMENT</span></td><td style="font-size:12.5px;">Assessment for Kasun Perera</td><td style="font-size:11px;color:var(--muted);">192.168.1.42</td></tr>
+          <tr><td style="font-size:12px;">01 Mar 14:28</td><td style="font-size:12px;">Dr. A. Perera</td><td><span class="badge badge-success">REPORT</span></td><td style="font-size:12.5px;">Downloaded PDF RPT-2026-0301-001</td><td style="font-size:11px;color:var(--muted);">192.168.1.42</td></tr>
+          <tr><td style="font-size:12px;">01 Mar 09:15</td><td style="font-size:12px;">System Admin</td><td><span class="badge badge-warning">USER_VERIFY</span></td><td style="font-size:12.5px;">Verified Dr. W.K.D. Bhagya account</td><td style="font-size:11px;color:var(--muted);">10.0.0.1</td></tr>
+          <tr><td style="font-size:12px;">28 Feb 16:44</td><td style="font-size:12px;">Dr. A. Perera</td><td><span class="badge badge-danger">EMERGENCY</span></td><td style="font-size:12.5px;">Emergency: Nimal Bandara (MCC)</td><td style="font-size:11px;color:var(--muted);">192.168.1.42</td></tr>
+        </tbody></table></div></div>
+      </div>
+      <div id="atab-model" style="display:none;">
+        <div class="page-header"><div class="page-title">AI Model Information</div></div>
+        <div class="g2">
+          <div class="card"><div class="card-title" style="margin-bottom:14px;">🧠 Architecture</div>
+            <div class="rfield"><span class="rfield-key">CNN</span><span class="rfield-val">EfficientNet-B4</span></div>
+            <div class="rfield"><span class="rfield-key">Symptom Model</span><span class="rfield-val">MLP [128→64→32]</span></div>
+            <div class="rfield"><span class="rfield-key">Fusion</span><span class="rfield-val">Late 70/30</span></div>
+            <div class="rfield"><span class="rfield-key">Input Size</span><span class="rfield-val">299×299×3</span></div>
+            <div class="rfield"><span class="rfield-key">Symptom Vector</span><span class="rfield-val">14-dimensional</span></div>
+            <div class="rfield"><span class="rfield-key">Classes</span><span class="rfield-val">MEL, BCC, SCC, MCC</span></div>
+            <div class="rfield"><span class="rfield-key">Explainability</span><span class="rfield-val">Grad-CAM</span></div>
+          </div>
+          <div class="card"><div class="card-title" style="margin-bottom:14px;">📊 Training</div>
+            <div class="rfield"><span class="rfield-key">Epochs</span><span class="rfield-val">50 (3-phase)</span></div>
+            <div class="rfield"><span class="rfield-key">Loss</span><span class="rfield-val">Focal Loss γ=2.0</span></div>
+            <div class="rfield"><span class="rfield-key">Optimizer</span><span class="rfield-val">AdamW</span></div>
+            <div class="rfield"><span class="rfield-key">MCC Weight</span><span class="rfield-val">5.0× (rare class)</span></div>
+            <div class="rfield"><span class="rfield-key">Augmentation</span><span class="rfield-val">CutMix 30% + MixUp 20%</span></div>
+            <div class="rfield"><span class="rfield-key">Dataset</span><span class="rfield-val">HAM10000 + ISIC + DermaCon-IN + MCC</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="qc-footer">Quantum Coders · DermAI v1.0.0 · Admin Console</div>
+</div>
+
+<!-- DELETE MODAL -->
+<div id="del-modal" style="display:none;position:fixed;inset:0;background:rgba(13,27,110,.5);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:var(--r);padding:36px;max-width:440px;width:90%;box-shadow:var(--shadow-lg);">
+    <div style="text-align:center;margin-bottom:22px;"><div style="font-size:48px;margin-bottom:12px;">⚠️</div><div style="font-size:20px;font-weight:800;color:var(--red);margin-bottom:8px;">Delete Account</div><div style="font-size:13.5px;color:var(--muted);line-height:1.65;">This action is <strong>irreversible</strong>. All patient records and reports will be permanently deleted.</div></div>
+    <div class="alert alert-danger" style="margin-bottom:16px;">⚠️ 47 patient records and 38 reports will be permanently deleted.</div>
+    <div class="fgroup"><label class="flabel">Type "DELETE" to confirm</label><input id="del-input" class="finput" placeholder="Type DELETE"/></div>
+    <div class="flex-end" style="margin-top:6px;"><button class="btn btn-outline" onclick="hideDelModal()">Cancel</button><button class="btn btn-danger" onclick="confirmDel()">🗑️ Delete Account</button></div>
+  </div>
+</div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
