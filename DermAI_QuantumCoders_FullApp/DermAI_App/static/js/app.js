@@ -30,10 +30,15 @@ async function api(path, method = "GET", body = null, isForm = false) {
 
 function showToast(msg, type = "info") {
   const wrap = $("toasts"); if (!wrap) return;
-  const icons = { success: "✅", error: "⚠️", info: "ℹ️", warning: "⚠️" };
+  const icons = {
+    success: '<i class="fa-solid fa-circle-check ui-icon ui-icon-fw"></i>',
+    error: '<i class="fa-solid fa-triangle-exclamation ui-icon ui-icon-fw"></i>',
+    info: '<i class="fa-solid fa-circle-info ui-icon ui-icon-fw"></i>',
+    warning: '<i class="fa-solid fa-triangle-exclamation ui-icon ui-icon-fw"></i>',
+  };
   const el = document.createElement("div");
   el.className = "toast toast-" + type;
-  el.innerHTML = '<span class="toast-icon">' + (icons[type] || "ℹ️") + "</span><span>" + msg + "</span>";
+  el.innerHTML = '<span class="toast-icon">' + (icons[type] || '<i class="fa-solid fa-circle-info ui-icon ui-icon-fw"></i>') + "</span><span>" + msg + "</span>";
   wrap.appendChild(el);
   setTimeout(() => el.remove(), 3800);
 }
@@ -210,7 +215,7 @@ async function onFilePicked(ev) {
 
 function qBadge(ok, label) {
   return '<span class="badge badge-' + (ok ? "success" : "danger") + '">' +
-         (ok ? "✅ " : "❌ ") + label + "</span>";
+         (ok ? '<i class="fa-solid fa-circle-check ui-icon ui-icon-fw"></i> ' : '❌ ') + label + '</span>';
 }
 
 /* build the Auto Quality Assessment panel from the REAL backend response */
@@ -219,7 +224,7 @@ function renderQA(r) {
   const c = r.checks, m = r.meta;
   const row = (ok, label, val) =>
     '<div class="qa-row ' + (ok ? "pass" : "fail") + '">' +
-      '<span class="qa-label">' + (ok ? "✅ " : "❌ ") + label + "</span>" +
+      '<span class="qa-label">' + (ok ? '<i class="fa-solid fa-circle-check ui-icon ui-icon-fw"></i> ' : '❌ '  ) + label + "</span>" +
       '<span class="badge badge-' + (ok ? "success" : "danger") + '">' + val + "</span></div>";
   const itaTxt = (r.ita === null || r.ita === undefined) ? "n/a" : r.ita + "° (Fitzpatrick est.)";
   list.innerHTML =
@@ -233,7 +238,7 @@ function renderQA(r) {
     '<div class="qa-row ' + (r.quality_pass ? "pass" : "warn") + '" style="border:2px solid rgba(46,125,50,.2);">' +
       '<span class="qa-label" style="font-weight:800;">Overall Status</span>' +
       '<span class="badge badge-' + (r.quality_pass ? "success" : "warning") + '" style="font-size:11px;">' +
-      (r.quality_pass ? "✅ SUITABLE FOR AI" : "⚠️ REVIEW — LOW QUALITY") + "</span></div>";
+      (r.quality_pass ? '<i class="fa-solid fa-circle-check ui-icon ui-icon-fw"></i> SUITABLE FOR AI' : '<i class="fa-solid fa-triangle-exclamation ui-icon ui-icon-fw"></i> REVIEW — LOW QUALITY') + '</span></div>';
 }
 
 function removeImg() {
@@ -348,7 +353,7 @@ function renderResults(res) {
     ? '<img src="/api/assess/' + res.assessment_id + '/heatmap" alt="heatmap" style="width:120px;height:120px;object-fit:cover;border-radius:8px;border:1px solid var(--border);"/>'
     : "";
   card.innerHTML =
-    '<div class="flex-between" style="margin-bottom:12px;"><div class="card-title">🧠 Live AI Result (from your database & model)</div>' +
+    '<div class="flex-between" style="margin-bottom:12px;"><div class="card-title"><i class="fa-solid fa-brain ui-icon ui-icon-fw"></i> Live AI Result (from your database & model)</div>' +
     modeBadge + "</div>" +
     '<div class="flex-start" style="gap:20px;flex-wrap:wrap;align-items:flex-start;">' +
       heat +
@@ -363,9 +368,9 @@ function renderResults(res) {
       "</div>" +
     "</div>" +
     '<div class="flex-start" style="gap:10px;margin-top:14px;flex-wrap:wrap;">' +
-      '<button class="btn btn-primary" onclick="go(\'report\')">📄 View Full Report</button>' +
-      '<button class="btn btn-secondary" onclick="downloadPDF()">📥 Download PDF</button>' +
-      '<button class="btn btn-outline" onclick="resetAssessment()">🔬 New Assessment</button></div>';
+      '<button class="btn btn-primary" onclick="go(\'report\')"><i class="fa-solid fa-file-lines ui-icon ui-icon-fw"></i> View Full Report</button>' +
+      '<button class="btn btn-secondary" onclick="downloadPDF()"><i class="fa-solid fa-download ui-icon ui-icon-fw"></i> Download PDF</button>' +
+      '<button class="btn btn-outline" onclick="resetAssessment()"><i class="fa-solid fa-microscope ui-icon ui-icon-fw"></i> New Assessment</button></div>';
 }
 
 function probBar(name, val, cls) {
@@ -390,7 +395,7 @@ async function loadReportBanner() {
     if (host && !$("report-live")) {
       const div = document.createElement("div");
       div.id = "report-live"; div.className = "report-sec"; div.style.background = "var(--p50)";
-      div.innerHTML = '<div class="rsec-title">🧠 Live AI Result (' + (a.mode || "rule").toUpperCase() + " MODE)</div>" +
+      div.innerHTML = '<div class="rsec-title"><i class="fa-solid fa-brain ui-icon ui-icon-fw"></i> Live AI Result (' + (a.mode || "rule").toUpperCase() + " MODE)</div>" +
         '<div class="rfield"><span class="rfield-key">Predicted Type</span><span class="rfield-val">' + a.predicted_type + "</span></div>" +
         '<div class="rfield"><span class="rfield-key">Confidence</span><span class="rfield-val">' + a.confidence + "%</span></div>" +
         '<div class="rfield"><span class="rfield-key">Stage</span><span class="rfield-val">' + a.stage + "</span></div>" +
@@ -440,8 +445,8 @@ async function loadAdmin() {
     const [u, s] = [await api("/api/admin/users"), await api("/api/admin/stats")];
     const tb = document.querySelector("#atab-users table tbody");
     if (tb) tb.innerHTML = u.users.map(x => {
-      const status = !x.is_active ? '<span class="badge badge-neutral">⛔ DEACTIVATED</span>'
-        : !x.is_verified ? '<span class="badge badge-warning">⏳ PENDING</span>'
+      const status = !x.is_active ? '<span class="badge badge-neutral"><i class="fa-solid fa-ban ui-icon ui-icon-fw"></i> DEACTIVATED</span>'
+        : !x.is_verified ? '<span class="badge badge-warning"><i class="fa-solid fa-hourglass-half ui-icon ui-icon-fw"></i> PENDING</span>'
         : '<span class="badge badge-success">● ACTIVE</span>';
       const role = x.role === "admin" ? '<span class="badge badge-danger">ADMIN</span>' : '<span class="badge badge-primary">DOCTOR</span>';
       let actions = '<button class="btn btn-xs btn-outline" onclick="adminAct(' + x.id + ",'" + (x.is_active ? "deactivate" : "activate") + "')\">" + (x.is_active ? "Deactivate" : "Activate") + "</button>";
@@ -482,7 +487,7 @@ async function loadAudit() {
 }
 
 /* ---------------------------------------------------------------- cosmetic UI helpers */
-function togglePass(id, el) { const i = $(id); if (!i) return; i.type = i.type === "password" ? "text" : "password"; if (el) el.textContent = i.type === "password" ? "👁" : "🙈"; }
+function togglePass(id, el) { const i = $(id); if (!i) return; i.type = i.type === "password" ? "text" : "password"; if (el) el.textContent = i.type === "password" ? '<i class="fa-solid fa-eye ui-icon ui-icon-fw"></i>' : '<i class="fa-solid fa-eye-slash ui-icon ui-icon-fw"></i>'; }
 function checkStrength(el) {/* visual only */}
 function selSkin(el, v) { $$(".skin-swatch").forEach(s => s.classList.remove("sel")); el.classList.add("sel"); S.fitz = v; }
 function selBody(el) { $$(".body-cell").forEach(b => b.classList.remove("sel")); el.classList.add("sel"); S.body = (el.textContent || "").replace("✓", "").trim(); }

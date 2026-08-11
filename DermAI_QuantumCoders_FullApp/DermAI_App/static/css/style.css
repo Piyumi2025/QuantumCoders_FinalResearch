@@ -1,4 +1,9 @@
 :root{
+/* Icon library helper styles */
+.ui-icon{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;}
+.ui-icon-fw{width:1.2em;}
+.ui-icon-sm{font-size:0.95em;}
+
   --p900:#0D1B6E;--p800:#1a237e;--p700:#1565C0;--p500:#1976D2;
   --p300:#64B5F6;--p100:#E3F2FD;--p50:#F0F4FF;
   --red:#C62828;--red-l:#FFEBEE;--amber:#E65100;--amber-l:#FFF3E0;

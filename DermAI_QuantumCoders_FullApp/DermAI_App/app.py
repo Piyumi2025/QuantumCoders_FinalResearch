@@ -45,7 +45,7 @@ def resolve_database_uri(app):
     except Exception as e:
         fallback = "sqlite:///%s" % os.path.join(app.root_path, "instance", "dermai.db")
         print("\n !! Could NOT connect to MySQL -> %s" % e)
-        print(" !! Reason is usually: WAMP not green / wrong root password / wrong port (try 3308) / PyMySQL not installed.")
+        print(" !! Reason is usually: WAMP not green / wrong root password / wrong port (try 3306) / PyMySQL not installed.")
         print(" !! Falling back to SQLite so the app still runs: %s\n" % fallback)
         return fallback
 

@@ -3,7 +3,7 @@
 Database selection is driven entirely by the DATABASE_URL environment variable.
   * Default (no env)  -> SQLite file at instance/dermai.db  (zero-setup demo)
   * MySQL             -> set DATABASE_URL, e.g.
-        mysql+pymysql://USER:PASSWORD@HOST:3306/dermai
+        mysql+pymysql://root:@127.0.0.1:3306/dermai
   * PostgreSQL        -> postgresql+psycopg2://USER:PASSWORD@HOST:5432/dermai
 """
 import os
@@ -17,7 +17,7 @@ class Config:
 
     # --- database ---
     # Permanent default: WAMP MySQL (root, blank password, localhost:3306, db 'dermai').
-    # If you set a MySQL root password or use port 3308, edit WAMP_MYSQL_URL below.
+    # If you set a MySQL root password or use port 3306, edit WAMP_MYSQL_URL below.
     # An env var DATABASE_URL, if present, still overrides this.
     WAMP_MYSQL_URL = "mysql+pymysql://root:@localhost:3306/dermai"
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", WAMP_MYSQL_URL)
