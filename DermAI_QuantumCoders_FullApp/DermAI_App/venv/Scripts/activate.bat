@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\User\OneDrive\Desktop\DermAI_QuantumCoders_FullApp\DermAI_App\venv
+set VIRTUAL_ENV=C:\Users\User\OneDrive\Desktop\FinalResearchQC\QuantumCoders_FinalResearch\DermAI_QuantumCoders_FullApp\DermAI_App\venv
 
 if not defined PROMPT set PROMPT=$P$G
 
